@@ -42,14 +42,19 @@ layout: default
 
           <!-- News -->
           {% if page.news and site.announcements.enabled -%}
-            <h2><a href="{{ '/news/' | relative_url }}" style="color: inherit;">news</a></h2>
+            <h2><a style="color: inherit;">Skills</a></h2>
             {%- include news.html limit=true %}
           {%- endif %}
 
           <!-- Latest posts -->
-          {% if page.latest_posts -%}
-            <h2><a href="{{ '/blog/' | relative_url }}" style="color: inherit;">latest posts</a></h2>
-            {%- include latest_posts.html %}
+          {% if page.education -%}
+            <h2><a  style="color: inherit;">Education</a></h2>
+            {%- include education.html limit=true %}
+          {%- endif %}
+
+          {% if page.achievement -%}
+            <h2><a  style="color: inherit;">Achievements and Certifications</a></h2>
+            {%- include achievement.html limit=true %}
           {%- endif %}
 
           <!-- Selected papers -->
