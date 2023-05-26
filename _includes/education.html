@@ -1,0 +1,30 @@
+          <div class="education">
+            {% if site.education != blank -%}
+            {%- assign education_size = site.education | size -%}
+            <div class="table-responsive" {% if include.limit and site.announcements.scrollable and education_size > 3 %}style="max-height: 60vw"{% endif %}>
+              <table class="table table-sm table-borderless">
+              {%- assign education = site.education -%}
+              {% if include.limit and site.announcements.limit %}
+              {% assign education_limit = site.announcements.limit %}
+              {% else %}
+              {% assign education_limit = education_size %}
+              {% endif %}
+              {% for item in education limit: education_limit %}
+                <tr>
+                  <th scope="row">{{ item.my_name }}</th>
+                  <td>
+                    {% if item.inline -%}
+                      {{ item.content | remove: '<p>' | remove: '</p>' | emojify }}
+                    {%- else -%}
+                      <a class="education-title" >{{ item.title }}</a>
+                    {%- endif %}
+                  </td>
+                  <td>{{ item.date | date: "%Y" }}</td>
+                </tr>
+              {%- endfor %}
+              </table>
+            </div>
+          {%- else -%}
+            <p>No education so far...</p>
+          {%- endif %}
+          </div>

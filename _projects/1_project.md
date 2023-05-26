@@ -1,80 +1,63 @@
 ---
 layout: page
-title: project 1
-description: a project with a background image
-img: assets/img/12.jpg
+title: 장애물 극복 및 험지에서 사용 가능한 모바일 로봇 플랫폼
+description: Urp Winter Research
+img: assets/img/1.png
 importance: 1
 category: work
 ---
 
-Every project has a beautiful feature showcase page.
-It's easy to include images in a flexible 3-column grid format.
-Make your photos 1/3, 2/3, or full width.
+1. 연구목적
 
-To give your project a background in the portfolio page, just add the img tag to the front matter like so:
+    모바일 로봇 시장의 규모는 증가하고 있다. 모바일 로봇 물류 시장 규모는 북미 기준 2019년에 47억 달러였으며 2027년에는 149.5억 달러로 약 3배 이상 성장할 것이라는 전망이다. 또한 제조, 물류 산업에서 모바일 로봇의 수익성이 성장하는 추세이다. 
 
-    ---
-    layout: page
-    title: project
-    description: a project with a background image
-    img: /assets/img/12.jpg
-    ---
+    우리 주변에서 쉽게 경험할 수 있는 모바일 로봇들로는 인천공항의 에어스타, 네이버의 루키, 배달의 민족의 딜리플레이트가 있다. 이 로봇들은 현재 실내 환경에서 사람과 상호작용 하며 운반 및 안내 역할을 수행하고 있다. 하지만 이 모바일 로봇들이 외부환경에서 운행할 경우 안정적이지 못하다. 
+
+    이번 연구의 목적은 이러한 모바일 로봇의 단점을 보완한 장애물 극복 및 험지에서 사용 가능한 모바일 로봇 플랫폼을 설계하는 것이다.
+
+
+2. 시장 조사 및 연구 동향
+
+    모바일 로봇 시장 조사에 따르면 현재 모바일 로봇의 문제점을 해결 한 로봇에는 상하이 시어 기업의 제품과 프랑스 ECA group의 AMS 제품이 있다. 시어 기업 제품의 경우 dynamic map navigation function과 RDS를 이용하여 교통 신호 모듈을 조정함으로써 사람과의 접촉을 피하고 장애물을 회피하여 외부환경에서 안정적으로 운행을 할 수 있고, ECA AMS 제품 서비스의 경우, SLAM기술을 활용해 외부 환경에서 현재 좌표를 알아내고 주어진 환경에서 경로 탐색 및 주행을 하여 이를 통해 보행자와 장애물을 회피할 수 있다. 이처럼 시장에서는 로봇을 네트워크와 연결하여 경로를 최적화하는 방식으로 이러한 한계를 극복하고 있다.
+
+
+
+    모바일 로봇의 연구 동향은 IEEE 저널을 통해 확인해 보았다. 저널의 로봇들은 여러 지형에서 주행하기 위해 leg-wheel 가변형바퀴를 도입하거나 로커보기 로봇의 형태를 채택하기도 하고 사족보행로봇 또는 이족보행로봇과 비슷한 다리형태에 바퀴를 결합하여 기동성 증가와 장애물 극복을 이루어내기도 하였다. 연구에서는 기동성이 좋고 장애물을 쉽게 극복할 수 있는 사족보행로봇 또는 이족보행로봇과 비슷한 다리형태에 바퀴를 결합한 로봇의 장점을 통해 이들과 비슷한 형상의 로봇을 만들기로 하였다. 가변형바퀴를 도입한 로봇이나 로커보기 로봇의 경우는 다른 부품을 추가하면 설계와 부품의 변경이 필요한 점이 모바일 플랫폼을 설계하는 연구목표와는 다르다고 판단하여 제외하였다.
+
+
+
+3. 3D 모델링 생성 및 구동
+
+    디자인한 로봇과 계단 규격 중 가장 큰 높이인 22cm 계단의 3D 모델링이다. 이 계단을 극복할 수 있기 위해 로봇의 몸통에 해당하는 부분을 계단보다 높은 위치에 있게 설계하였다.
+    다리 부분의 각도가 최소일 때와 최대일 때의 상황을 보여준다. 지면으로부터 몸통의 모터까지 높이는 17cm부터 30cm까지 변화한다. 또한 변화 과정에서 2개의 모터가 일정하게 각도가 증가하며 로봇의 중심과 바퀴가 지면으로부터 동일한 수직선상에 있는 상태를 유지하며 변화한다.
+
+
+
+4. 차후 연구 계획
+
+
+    현재 링크 길이의 경우 대략적으로 정했기 때문에 다리와 바퀴 사이의 최소-최대 각도 범위내 작동하는 모터 가동 구간을 프로이덴슈타인 equation을 이용해 계산하여 각 링크 길이를 정할 것이다. 
+    그 후 ROS-Gazebo 프로그램에 3D모델링을 반영하고 로봇의 dynamic model을 시뮬레이션 하면서 로봇을 제어할 것이다.
+    전체적인 시스템 제어 부분에서는 엔코더와 토크센서를 통해 상태를 예측하고 포지션 컨트롤러와 균형 컨트롤러를 거쳐 바퀴모터와 힙모터를 제어할 것이다. 
+    이후에 엔시스 다이나믹을 사용하여 모델링의 안전성을 평가하고 다리 부분만을 제작 및 제어를 진행한 다음, 전체 실물을 제작하여 다양한 환경을 극복하는 테스트를 거칠 예정이다.
+
+
+
+5. 기대효과
+
+
+
+    완성된 로봇은 스스로 균형을 잡고 여러 지형에서 지연 없이 움직일 것이다. 로봇 위에 여러 목적을 가진 모듈이나 센서를 탑재할 수 있을 것이고 이를 통해 연구실에서 이용하는 센서들을 탑재하여 테스트해 볼 수 있고 다른 기능을 가진 모듈과 결합되어 특수한 목적을 수행할 수 있다.
+
 
 <div class="row">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/1.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
+    <div class="col-sm mt-5 mt-md-0">
+        {% include figure.html path="assets/img/1.png" title="3D 모델링" class="img-fluid rounded z-depth-1" %}
     </div>
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/3.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/5.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
+    <div class="col-sm mt-5 mt-md-0">
+        {% include figure.html path="assets/img/2.png" title="다리의 구동" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 <div class="caption">
-    Caption photos easily. On the left, a road goes through a tunnel. Middle, leaves artistically fall in a hipster photoshoot. Right, in another hipster photoshoot, a lumberjack grasps a handful of pine needles.
+    왼쪽 3D 모델링. 오른쪽 다리의 구동 
 </div>
-<div class="row">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/5.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    This image can also have a caption. It's like magic.
-</div>
-
-You can also put regular text between your rows of images.
-Say you wanted to write a little bit about your project before you posted the rest of the images.
-You describe how you toiled, sweated, *bled* for your project, and then... you reveal its glory in the next row of images.
-
-
-<div class="row justify-content-sm-center">
-    <div class="col-sm-8 mt-3 mt-md-0">
-        {% include figure.html path="assets/img/6.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm-4 mt-3 mt-md-0">
-        {% include figure.html path="assets/img/11.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    You can also have artistically styled 2/3 + 1/3 images, like these.
-</div>
-
-
-The code is simple.
-Just wrap your images with `<div class="col-sm">` and place them inside `<div class="row">` (read more about the <a href="https://getbootstrap.com/docs/4.4/layout/grid/">Bootstrap Grid</a> system).
-To make images responsive, add `img-fluid` class to each; for rounded corners and shadows use `rounded` and `z-depth-1` classes.
-Here's the code for the last row of images above:
-
-{% raw %}
-```html
-<div class="row justify-content-sm-center">
-    <div class="col-sm-8 mt-3 mt-md-0">
-        {% include figure.html path="assets/img/6.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm-4 mt-3 mt-md-0">
-        {% include figure.html path="assets/img/11.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-```
-{% endraw %}

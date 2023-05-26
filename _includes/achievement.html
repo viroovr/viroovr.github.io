@@ -1,0 +1,30 @@
+          <div class="achievement">
+            {% if site.achievement != blank -%}
+            {%- assign achievement_size = site.achievement | size -%}
+            <div class="table-responsive" {% if include.limit and site.announcements.scrollable and achievement_size > 3 %}style="max-height: 60vw"{% endif %}>
+              <table class="table table-sm table-borderless">
+              {%- assign achievement = site.achievement -%}
+              {% if include.limit and site.announcements.limit %}
+              {% assign achievement_limit = site.announcements.limit %}
+              {% else %}
+              {% assign achievement_limit = achievement_size %}
+              {% endif %}
+              {% for item in achievement limit: achievement_limit %}
+                <tr>
+                  <th scope="row">{{ item.my_name }}</th>
+                  <td>
+                    {% if item.inline -%}
+                      {{ item.content | remove: '<p>' | remove: '</p>' | emojify }}
+                    {%- else -%}
+                      <a class="achievement-title" >{{ item.title }}</a>
+                    {%- endif %}
+                  </td>
+                  <td>{{ item.date | date: "%Y" }}</td>
+                </tr>
+              {%- endfor %}
+              </table>
+            </div>
+          {%- else -%}
+            <p>No achievement so far...</p>
+          {%- endif %}
+          </div>
