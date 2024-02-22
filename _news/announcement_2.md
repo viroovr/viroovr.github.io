@@ -5,4 +5,5 @@ inline: true
 related_posts: false
 my_name: "Python"
 ---
-Django. PyTorch. Pandas
+
+Django. PyTorch.
