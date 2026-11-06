@@ -1,163 +1,68 @@
 <!DOCTYPE html>
 <html lang="ko">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<!-- Begin Jekyll SEO tag v2.9.1 -->
+<title>DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현 | 서현원</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현" />
+<meta name="author" content="서현원" />
+<meta property="og:locale" content="ko" />
+<meta name="description" content="K-Software Empowerment Bootcamp Team “InsightMedi”" />
+<meta name="twitter:description" property="og:description" content="K-Software Empowerment Bootcamp Team “InsightMedi”" />
+<link rel="canonical" href="https://viroovr.github.io/projects/2_project/" />
+<meta property="og:url" content="https://viroovr.github.io/projects/2_project/" />
+<meta property="og:site_name" content="서현원" />
+<meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-11-06T15:32:29+09:00" />
+<meta property="article:modified_time" content="2026-11-06T15:32:29+09:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta name="twitter:title" content="DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"서현원"},"dateModified":"2026-11-06T15:32:29+09:00","datePublished":"2026-11-06T15:32:29+09:00","description":"K-Software Empowerment Bootcamp Team “InsightMedi”","headline":"DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현","image":"https://viroovr.github.io/assets/img/my_pic.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://viroovr.github.io/projects/2_project/"},"url":"https://viroovr.github.io/projects/2_project/"}</script>
+<!-- End Jekyll SEO tag -->
 
-  <!-- Head -->
-  <head>    <!-- Metadata, OpenGraph and Schema.org -->
-    
+<link type="application/atom+xml" rel="alternate" href="https://viroovr.github.io/feed.xml" title="서현원" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234f46e5%22/><text x=%2250%22 y=%2268%22 font-size=%2256%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22700%22>현</text></svg>">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script>
+  // 테마: 저장값 > OS 설정. 깜빡임 없게 head 에서 먼저 적용
+  (function () {
+    var t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+  })();
+</script>
 
-    <!-- Standard metadata -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현 | Hyeonwon  Seo</title>
-    <meta name="author" content="Hyeonwon  Seo" />
-    <meta name="description" content="K-Software Empowerment Bootcamp Team "InsightMedi"" />
-    <meta name="keywords" content="backend, java, spring, postgresql, troubleshooting, portfolio, tech-blog" />
+</head>
+<body class="page">
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">서현원</a>
+    <nav class="nav" aria-label="주요 메뉴"><a href="/blog/" >블로그</a>
+      <a href="/projects/" aria-current="page">프로젝트</a>
+      <button class="theme-toggle" type="button" aria-label="다크 모드 전환" title="다크 모드 전환">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
 
-    <!-- OpenGraph -->
-    <meta property="og:site_name" content="Hyeonwon  Seo" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Hyeonwon  Seo | DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현" />
-    <meta property="og:url" content="https://viroovr.github.io/projects/2_project/" />
-    <meta property="og:description" content="K-Software Empowerment Bootcamp Team "InsightMedi"" />
-    <meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
-    <meta property="og:locale" content="ko" />
-
-    <!-- Twitter card -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현" />
-    <meta name="twitter:description" content="K-Software Empowerment Bootcamp Team "InsightMedi"" />
-    <meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
-    
-
-    <!-- Schema.org -->
-    <script type="application/ld+json">
-      {
-        "author":
-        {
-          "@type": "Person",
-          "name": "Hyeonwon  Seo"
-        },
-        "url": "https://viroovr.github.io/projects/2_project/",
-        "@type": "WebSite",
-        "description": "K-Software Empowerment Bootcamp Team "InsightMedi"",
-        "headline": "DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현",
-        "sameAs": ["https://github.com/viroovr"],
-        "name": "Hyeonwon  Seo",
-        "@context": "https://schema.org"
-      }
-    </script>
-
-
-    <!-- Bootstrap & MDB -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-DF7Zhf293AJxJNTmh5zhoYYIMs2oXitRfBjY+9L//AY=" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/css/mdb.min.css" integrity="sha256-jpjYvU3G3N6nrrBwXJoVEYI/0zw8htfFnhT9ljN3JJw=" crossorigin="anonymous" />
-
-    <!-- Bootstrap Table -->
-    <link defer rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.css">
-
-    <!-- Fonts & Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.1/css/academicons.min.css" integrity="sha256-i1+4qU2G2860dGGIOJscdC30s9beBXjFfzjWLjBRsBg=" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-
-    <!-- Code Syntax Highlighting -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/github.css" media="" id="highlight_theme_light" />
-
-    
-
-    <!-- Styles -->
-    
-    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>">
-    
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="canonical" href="https://viroovr.github.io/projects/2_project/">
-
-    <!-- Dark Mode -->
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/native.css" media="none" id="highlight_theme_dark" />
-
-    <script src="/assets/js/theme.js"></script>
-    <script src="/assets/js/dark_mode.js"></script>
-    
-
-  </head>
-
-  <!-- Body -->
-  <body class="fixed-top-nav sticky-bottom-footer">
-
-    <!-- Header -->
-    <header>
-
-      <!-- Nav Bar -->
-      <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
-        <div class="container">
-          <a class="navbar-brand title font-weight-lighter" href="/"><span class="font-weight-bold">Hyeonwon&nbsp;</span>Seo</a>
-          <!-- Navbar Toggle -->
-          <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar top-bar"></span>
-            <span class="icon-bar middle-bar"></span>
-            <span class="icon-bar bottom-bar"></span>
-          </button>
-
-          <div class="collapse navbar-collapse text-right" id="navbarNav">
-            <ul class="navbar-nav ml-auto flex-nowrap">
-
-              <!-- About -->
-              <li class="nav-item ">
-                <a class="nav-link" href="/">about</a>
-              </li>
-              
-              <!-- Blog -->
-              <li class="nav-item ">
-                <a class="nav-link" href="/blog/">blog</a>
-              </li>
-
-              <!-- Other pages -->
-              <li class="nav-item ">
-                <a class="nav-link" href="/projects/">projects</a>
-              </li>
-              <li class="nav-item ">
-                <a class="nav-link" href="/repositories/">repositories</a>
-              </li>
-
-              <!-- Toogle theme mode -->
-              <li class="toggle-container">
-                <button id="light-toggle" title="Change theme">
-                  <i class="fas fa-moon"></i>
-                  <i class="fas fa-sun"></i>
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-
-      <!-- Scrolling Progress Bar -->
-      <progress id="progress" value="0">
-        <div class="progress-container">
-          <span class="progress-bar"></span>
-        </div>
-      </progress>
-    </header>
-
-
-    <!-- Content -->
-    <div class="container mt-5">
-      
-        <!-- page.html -->
-        <div class="post">
-
-          <header class="post-header">
-            <h1 class="post-title">DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현</h1>
-            <p class="post-description">K-Software Empowerment Bootcamp Team "InsightMedi"</p>
-            <ul class="stack-chips"><li>Python</li><li>OpenCV</li><li>Object Tracking</li></ul>
-          </header>
-
-          <article>
-            <p>1 . 연구목적</p>
+  <main id="main" class="wrap">
+    <article class="article">
+  <header class="article-head"><a class="back" href="/projects/">← 프로젝트</a>
+    <h1>DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현</h1><p class="lead">K-Software Empowerment Bootcamp Team "InsightMedi"</p>
+    <ul class="chips"><li>Python</li><li>OpenCV</li><li>Object Tracking</li></ul>
+  </header>
+  <div class="prose">
+    <p>1 . 연구목적</p>
 
 <p>의료 및 헬스케어 분야의 전문가에게 시간적 자원의 가치는 높으므로, 최근 라벨링
 과정에서 소요되는 많은 시간들을 줄이기 위한 연구 및 개발이 요구되고 있다.
@@ -185,31 +90,15 @@ InsightMedi는 이러한 문제 해결에 대한 필요성을 고려하여 기�
 
 <div class="row mt-5">
     <div class="col-sm mt-5 mt-md-0">
-        <figure>
-
-  <picture>
-    
-
-    <!-- Fallback to the original file -->
-    <img src="/assets/img/2_before.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" title="before object tracking" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
-
-  </picture>
-
+        <figure class="figure">
+  <img src="/assets/img/2_before.png" alt="before object tracking" loading="lazy" />
 </figure>
 
         그림 1. 객체 추적 초기 영상 이미지
     </div>
     <div class="col-sm mt-5 mt-md-0">
-        <figure>
-
-  <picture>
-    
-
-    <!-- Fallback to the original file -->
-    <img src="/assets/img/2_after.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" title="after object tracking" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
-
-  </picture>
-
+        <figure class="figure">
+  <img src="/assets/img/2_after.png" alt="after object tracking" loading="lazy" />
 </figure>
 
         그림 2. 객체 추적 후 영상 이미지
@@ -238,16 +127,8 @@ InsightMedi는 이러한 문제 해결에 대한 필요성을 고려하여 기�
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-    
-
-<figure>
-
-  
-
-  <video src="/assets/video/A.mp4" class="img-fluid rounded z-depth-1" width="auto" height="auto" controls="" />
-
-  
-
+    <figure class="figure">
+  <video src="/assets/video/A.mp4" controls="" preload="metadata" playsinline=""></video>
 </figure>
 
     DICOM 파일의 라벨링 및 윈도윙 기능
@@ -256,156 +137,29 @@ InsightMedi는 이러한 문제 해결에 대한 필요성을 고려하여 기�
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-    
-
-<figure>
-
-  
-
-  <video src="/assets/video/B.mp4" class="img-fluid rounded z-depth-1" width="auto" height="auto" controls="" />
-
-  
-
+    <figure class="figure">
+  <video src="/assets/video/B.mp4" controls="" preload="metadata" playsinline=""></video>
 </figure>
 
     의료 영상 반자동 객체 추적 기능
     </div>
 </div>
 
-          </article>
-          <p class="back-link"><a href="/projects/">&larr; 프로젝트 목록</a></p>
+  </div>
+</article>
 
-        </div>
+  </main>
+  <footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 서현원</span>
+    <span class="footer-links">
+      <a href="https://github.com/viroovr" rel="noopener">GitHub</a>
+      <a href="mailto:tjgusdnjs789@gmail.com">Email</a>
+      <a href="/feed.xml">RSS</a>
+    </span>
+  </div>
+</footer>
 
-      
-    </div>
-
-    <!-- Footer -->    <footer class="sticky-bottom mt-5">
-      <div class="container">
-        &copy; Copyright 2026 Hyeonwon  Seo. Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
-
-      </div>
-    </footer>
-
-    <!-- JavaScripts -->
-    <!-- jQuery -->
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-
-    <!-- Bootsrap & MDB scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha256-fgLAgv7fyCGopR/gBNq2iW3ZKIdqIcyshnUULC4vex8=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/js/mdb.min.js" integrity="sha256-NdbiivsvWt7VYCt6hYNT3h/th9vSTL4EDWeGs5SN3DA=" crossorigin="anonymous"></script>
-
-    <!-- Masonry & imagesLoaded -->
-  <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
-  <script defer src="/assets/js/masonry.js" type="text/javascript"></script>
-    
-  <!-- Medium Zoom JS -->
-  <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.8/dist/medium-zoom.min.js" integrity="sha256-7PhEpEWEW0XXQ0k6kQrPKwuoIomz8R8IYyuU1Qew4P8=" crossorigin="anonymous"></script>
-  <script defer src="/assets/js/zoom.js"></script>
-
-  <!-- Bootstrap Table -->
-  <script defer src="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.js"></script>
-
-  <!-- Load Common JS -->
-  <script src="/assets/js/no_defer.js"></script>
-  <script defer src="/assets/js/common.js"></script>
-  <script defer src="/assets/js/copy_code.js" type="text/javascript"></script>
-
-    
-  <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script>
-  <script async src="https://badge.dimensions.ai/badge.js"></script>
-
-    <!-- MathJax -->
-  <script type="text/javascript">
-    window.MathJax = {
-      tex: {
-        tags: 'ams'
-      }
-    };
-  </script>
-  <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
-  <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-
-    
-    
-
-<!-- Scrolling Progress Bar -->
-<script type="text/javascript">
-  /*
-   * This JavaScript code has been adapted from the article 
-   * https://css-tricks.com/reading-position-indicator/ authored by Pankaj Parashar, 
-   * published on the website https://css-tricks.com on the 7th of May, 2014.
-   * Couple of changes were made to the original code to make it compatible 
-   * with the `al-foio` theme.
-   */
-  const progressBar = $("#progress");
-  /*
-   * We set up the bar after all elements are done loading.
-   * In some cases, if the images in the page are larger than the intended
-   * size they'll have on the page, they'll be resized via CSS to accomodate
-   * the desired size. This mistake, however, breaks the computations as the
-   * scroll size is computed as soon as the elements finish loading.
-   * To account for this, a minimal delay was introduced before computing the
-   * values.
-   */
-  window.onload = function () {
-    setTimeout(progressBarSetup, 50);
-  };
-  /*
-   * We set up the bar according to the browser.
-   * If the browser supports the progress element we use that.
-   * Otherwise, we resize the bar thru CSS styling
-   */
-  function progressBarSetup() {
-    if ("max" in document.createElement("progress")) {
-      initializeProgressElement();
-      $(document).on("scroll", function() {
-        progressBar.attr({ value: getCurrentScrollPosition() });
-      });
-      $(window).on("resize", initializeProgressElement);
-    } else {
-      resizeProgressBar();
-      $(document).on("scroll", resizeProgressBar);
-      $(window).on("resize", resizeProgressBar);
-    }
-  }
-  /*
-   * The vertical scroll position is the same as the number of pixels that
-   * are hidden from view above the scrollable area. Thus, a value > 0 is
-   * how much the user has scrolled from the top
-   */
-  function getCurrentScrollPosition() {
-    return $(window).scrollTop();
-  }
-
-  function initializeProgressElement() {
-    let navbarHeight = $("#navbar").outerHeight(true);
-    $("body").css({ "padding-top": navbarHeight });
-    $("progress-container").css({ "padding-top": navbarHeight });
-    progressBar.css({ top: navbarHeight });
-    progressBar.attr({
-      max: getDistanceToScroll(),
-      value: getCurrentScrollPosition(),
-    });
-  }
-  /*
-   * The offset between the html document height and the browser viewport
-   * height will be greater than zero if vertical scroll is possible.
-   * This is the distance the user can scroll
-   */
-  function getDistanceToScroll() {
-    return $(document).height() - $(window).height();
-  }
-
-  function resizeProgressBar() {
-    progressBar.css({ width: getWidthPercentage() + "%" });
-  }
-  // The scroll ratio equals the percentage to resize the bar
-  function getWidthPercentage() {
-    return (getCurrentScrollPosition() / getDistanceToScroll()) * 100;
-  }
-</script>
-
-  </body>
+  <script src="/assets/js/site.js" defer></script>
+</body>
 </html>
