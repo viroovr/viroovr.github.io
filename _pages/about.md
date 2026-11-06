@@ -18,6 +18,13 @@ selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 ---
 
+<div class="hero-actions">
+  <a class="btn-pill primary" href="/blog/"><i class="fas fa-pen-nib"></i> 블로그</a>
+  <a class="btn-pill" href="/projects/"><i class="fas fa-layer-group"></i> 프로젝트</a>
+  <a class="btn-pill" href="https://github.com/viroovr" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+  <a class="btn-pill" href="mailto:tjgusdnjs789@gmail.com"><i class="fas fa-envelope"></i> 메일</a>
+</div>
+
 안녕하세요, 협업툴 [Flow](https://flow.team)에서 백엔드 개발을 하고 있는 서현원입니다.
 
 운영 중 생기는 장애와 성능 문제를 **증상 → 관측 → 원인 → 수정 → 검증** 순서로 끝까지 추적하는 일을 주로 합니다.
@@ -25,5 +32,3 @@ Java/Spring 기반 WAS, PostgreSQL 쿼리 튜닝, JVM 메모리·CPU 분석, Nod
 
 성균관대학교에서 기계공학과 소프트웨어학을 함께 공부했고, 지금도 시스템이 *왜* 그렇게 동작하는지 파고드는 것을 좋아합니다.
 
-- 블로그: 원인까지 추적한 트러블슈팅 기록과 사이드 프로젝트 이야기 → [blog](/blog/)
-- 프로젝트: 학교·부트캠프 프로젝트와 개인 사이드 프로젝트 → [projects](/projects/)

@@ -5,6 +5,7 @@ description: K-Software Empowerment Bootcamp Team "InsightMedi"
 img: assets/img/2_dicom_project.png
 importance: 2
 category: school
+stack: [Python, OpenCV, Object Tracking]
 ---
 
 1 . 연구목적

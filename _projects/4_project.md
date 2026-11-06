@@ -4,6 +4,7 @@ title: 개인 투자 대시보드
 description: 코인·국내주식·해외 지수를 한 화면에서 보는 1인용 로컬 웹 콘솔
 importance: 1
 category: side
+stack: [Python, Upbit API, KIS API, Telegram Bot]
 ---
 
 ## 무엇을 만들었나
@@ -19,4 +20,3 @@ category: side
 - 외부 노출 없이 `127.0.0.1` + 사설 VPN 으로만 접근
 - 기능마다 조사 → 계획 → 구현 → 검증 → 회고 문서를 남기며 진행
 
-**Stack** Python · Upbit / KIS Open API · Telegram Bot · launchd

@@ -1,0 +1,136 @@
+---
+layout: none
+permalink: /admin/
+sitemap: false
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net; connect-src https://api.github.com; img-src 'self' data: blob: https://raw.githubusercontent.com https://avatars.githubusercontent.com; base-uri 'none'; form-action 'none'">
+  <title>admin · viroovr</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+  <!-- 로그인 -->
+  <section id="login" class="login" hidden>
+    <div class="login-card">
+      <h1>블로그 관리</h1>
+      <p class="muted">viroovr/viroovr.github.io 에 바로 커밋합니다. 저장하면 1~2분 뒤 사이트에 반영돼요.</p>
+      <label>GitHub 토큰
+        <input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
+      </label>
+      <label class="check"><input id="remember" type="checkbox"> 이 기기에 기억 (공용 PC 에서는 끄기)</label>
+      <div class="row">
+        <button id="loginBtn" class="primary">로그인</button>
+        <button id="readonlyBtn">토큰 없이 둘러보기</button>
+      </div>
+      <p id="loginMsg" class="msg" role="alert"></p>
+      <details class="help">
+        <summary>토큰 만드는 법</summary>
+        <ol>
+          <li>GitHub → Settings → Developer settings → <b>Fine-grained tokens</b> → Generate new token</li>
+          <li>Repository access: <b>Only select repositories</b> → <code>viroovr.github.io</code></li>
+          <li>Permissions: <b>Contents: Read and write</b>, <b>Actions: Read-only</b></li>
+          <li>만료일은 90일 이하 권장. 만든 토큰을 위에 붙여넣기</li>
+        </ol>
+        <p class="muted">토큰은 이 브라우저에만 저장되고 api.github.com 으로만 전송됩니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- 앱 -->
+  <div id="app" class="app" hidden>
+    <header class="topbar">
+      <button id="menuBtn" class="icon only-mobile" aria-label="목록 열기">☰</button>
+      <strong>블로그 관리</strong>
+      <span id="mode" class="badge"></span>
+      <a id="deploy" class="deploy" target="_blank" rel="noopener" title="최근 배포 상태">배포 상태 확인 중…</a>
+      <span class="spacer"></span>
+      <a href="/" target="_blank" rel="noopener">사이트 ↗</a>
+      <button id="logoutBtn">로그아웃</button>
+    </header>
+
+    <aside id="sidebar" class="sidebar">
+      <div class="tabs" role="tablist">
+        <button data-type="posts" class="tab active" role="tab">글</button>
+        <button data-type="projects" class="tab" role="tab">프로젝트</button>
+      </div>
+      <div class="side-actions">
+        <input id="search" type="search" placeholder="검색">
+        <button id="newBtn" class="primary">+ 새로 만들기</button>
+      </div>
+      <ul id="list" class="list" aria-live="polite"></ul>
+    </aside>
+
+    <main id="editor" class="editor">
+      <div id="empty" class="empty">
+        <p>왼쪽에서 항목을 고르거나 <b>새로 만들기</b>를 누르세요.</p>
+      </div>
+
+      <form id="form" hidden autocomplete="off">
+        <div class="file-line"><span id="filePath" class="muted"></span><span id="dirty" class="dirty" hidden>● 저장 안 됨</span></div>
+
+        <label>제목 <input name="title" required></label>
+
+        <div class="grid">
+          <label data-for="posts">공개 시각 <input name="date" type="datetime-local" step="60"></label>
+          <label data-for="posts">주소(slug) <input name="slug" pattern="[a-z0-9\-]+" placeholder="my-first-post"></label>
+          <label data-for="projects">분류
+            <select name="category"><option value="side">side (사이드 프로젝트)</option><option value="school">school (학교·부트캠프)</option></select>
+          </label>
+          <label data-for="projects">정렬 순서 <input name="importance" type="number" min="1" step="1"></label>
+        </div>
+        <p id="dateWarn" class="warn" hidden>미래 시각이면 그 시각이 지나고 다음 배포 때까지 글이 보이지 않습니다.</p>
+
+        <label>한 줄 설명 <input name="description"></label>
+
+        <div class="grid">
+          <label data-for="posts">태그 <input name="tags" placeholder="troubleshooting performance (띄어쓰기로 구분)"></label>
+          <label data-for="posts">카테고리 <input name="categories" placeholder="blog"></label>
+          <label data-for="projects">기술 스택 <input name="stack" placeholder="Python, Spring (쉼표로 구분)"></label>
+          <label data-for="projects">썸네일 경로 <input name="img" placeholder="assets/img/xxx.png"></label>
+        </div>
+
+        <label class="check" data-for="posts"><input name="published" type="checkbox"> 공개 (끄면 임시저장 — 사이트에 안 보임)</label>
+
+        <div class="body-head">
+          <div class="seg" role="tablist">
+            <button type="button" data-view="edit" class="active">작성</button>
+            <button type="button" data-view="split" class="only-desktop">나란히</button>
+            <button type="button" data-view="preview">미리보기</button>
+          </div>
+          <label class="upload">🖼 이미지 넣기<input id="imgFile" type="file" accept="image/*" hidden></label>
+        </div>
+        <div id="bodyWrap" class="body-wrap view-edit">
+          <textarea id="body" name="body" spellcheck="false" placeholder="마크다운으로 작성"></textarea>
+          <article id="preview" class="preview"></article>
+        </div>
+
+        <details class="extra">
+          <summary>기타 front matter (그대로 보존됨)</summary>
+          <textarea id="extra" name="extra" spellcheck="false" rows="4"></textarea>
+        </details>
+
+        <div class="actions">
+          <button id="saveBtn" type="submit" class="primary">저장 (커밋)</button>
+          <a id="viewBtn" target="_blank" rel="noopener">사이트에서 보기 ↗</a>
+          <span class="spacer"></span>
+          <button id="deleteBtn" type="button" class="danger">삭제</button>
+        </div>
+        <p id="formMsg" class="msg" role="status"></p>
+      </form>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js" integrity="sha384-+VfUPEb0PdtChMwmBcBmykRMDd+v6D/oFmB3rZM/puCMDYcIvF968OimRh4KQY9a" crossorigin="anonymous"></script>
+  <script src="/assets/js/admin.js"></script>
+</body>
+</html>

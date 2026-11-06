@@ -5,6 +5,7 @@ description: Capstone Design Project, Sungkyunkwan University
 img: assets/img/3_skkuexs.png
 importance: 1
 category: school
+stack: [Django, Python, AWS Lightsail, KoT5]
 ---
 
 1 . Introduction

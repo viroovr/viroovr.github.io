@@ -5,6 +5,7 @@ description: Urp Winter Research
 img: assets/img/1.png
 importance: 3
 category: school
+stack: [ROS, Gazebo, 3D Modeling]
 ---
 
 1. 연구목적
