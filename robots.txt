@@ -1,4 +1,4 @@
 User-agent: *
-Disallow:
+Disallow: /admin/
 
 Sitemap: https://viroovr.github.io/sitemap.xml

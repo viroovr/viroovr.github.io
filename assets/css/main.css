@@ -1058,5 +1058,161 @@ d-appendix a:hover, d-appendix a.footnote-backlink:hover {
     grid-column: none;
   }
 }
+/******************************************************************************
+ * Custom overrides (FEATURE-044)
+ ******************************************************************************/
+body, .navbar, .btn, h1, h2, h3, h4, h5, h6, .post-title, .card-title {
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+body {
+  word-break: keep-all;
+  line-height: 1.7;
+}
+
+code, pre, .profile .address {
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.25rem 0 1.25rem;
+}
+
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--global-divider-color);
+  border-radius: 999px;
+  color: var(--global-text-color) !important;
+  font-size: 0.9rem;
+  text-decoration: none !important;
+  transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+}
+.btn-pill:hover {
+  border-color: var(--global-theme-color);
+  color: var(--global-theme-color) !important;
+}
+.btn-pill.primary {
+  background-color: var(--global-theme-color);
+  border-color: var(--global-theme-color);
+  color: var(--global-hover-text-color) !important;
+}
+.btn-pill.primary:hover {
+  opacity: 0.9;
+  color: var(--global-hover-text-color) !important;
+}
+
+@media (max-width: 575.98px) {
+  .profile {
+    float: none !important;
+    margin: 0 auto 1rem !important;
+    width: 140px;
+    text-align: center;
+  }
+  .profile .address {
+    font-size: 0.8rem;
+  }
+}
+.news .table-responsive, .education .table-responsive, .achievement .table-responsive {
+  max-height: none !important;
+}
+.news th, .education th, .achievement th {
+  width: 34%;
+  font-weight: 600;
+  color: var(--global-text-color) !important;
+}
+.news td, .education td, .achievement td {
+  color: var(--global-text-color) !important;
+}
+.news td:nth-of-type(2), .education td:nth-of-type(2), .achievement td:nth-of-type(2) {
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+@media (max-width: 575.98px) {
+  .news tr, .education tr, .achievement tr {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--global-divider-color);
+  }
+  .news th, .education th, .achievement th {
+    width: 100%;
+    padding-bottom: 0 !important;
+  }
+  .news td, .education td, .achievement td {
+    padding-top: 0.1rem !important;
+  }
+  .news td:first-of-type, .education td:first-of-type, .achievement td:first-of-type {
+    flex: 1;
+  }
+}
+.projects .card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.projects .card:hover {
+  transform: translateY(-2px);
+}
+.projects .card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 0.4rem;
+}
+.projects .card-text {
+  font-size: 0.9rem;
+  color: var(--global-text-color-light);
+}
+.projects h2.category {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 575.98px) {
+  .projects .grid-item {
+    width: 100%;
+  }
+}
+.stack-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+.stack-chips li {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background-color: var(--global-code-bg-color);
+  color: var(--global-text-color);
+}
+
+.back-link {
+  margin-top: 2rem;
+  font-size: 0.95rem;
+}
+
+.post article {
+  font-size: 1.02rem;
+}
+.post article h2 {
+  margin-top: 2rem;
+  font-weight: 700;
+}
+.post article h3 {
+  margin-top: 1.5rem;
+  font-weight: 600;
+}
 
 /*# sourceMappingURL=main.css.map */

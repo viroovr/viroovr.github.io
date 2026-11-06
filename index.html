@@ -64,6 +64,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.1/css/academicons.min.css" integrity="sha256-i1+4qU2G2860dGGIOJscdC30s9beBXjFfzjWLjBRsBg=" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 
     <!-- Code Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/github.css" media="" id="highlight_theme_light" />
@@ -88,7 +89,7 @@
   </head>
 
   <!-- Body -->
-  <body class="fixed-top-nav ">
+  <body class="fixed-top-nav sticky-bottom-footer">
 
     <!-- Header -->
     <header>
@@ -193,17 +194,20 @@
           </div>
 
           <div class="clearfix">
-            <p>안녕하세요, 협업툴 <a href="https://flow.team">Flow</a>에서 백엔드 개발을 하고 있는 서현원입니다.</p>
+            <div class="hero-actions">
+  <a class="btn-pill primary" href="/blog/"><i class="fas fa-pen-nib"></i> 블로그</a>
+  <a class="btn-pill" href="/projects/"><i class="fas fa-layer-group"></i> 프로젝트</a>
+  <a class="btn-pill" href="https://github.com/viroovr" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+  <a class="btn-pill" href="mailto:tjgusdnjs789@gmail.com"><i class="fas fa-envelope"></i> 메일</a>
+</div>
+
+<p>안녕하세요, 협업툴 <a href="https://flow.team">Flow</a>에서 백엔드 개발을 하고 있는 서현원입니다.</p>
 
 <p>운영 중 생기는 장애와 성능 문제를 <strong>증상 → 관측 → 원인 → 수정 → 검증</strong> 순서로 끝까지 추적하는 일을 주로 합니다.
 Java/Spring 기반 WAS, PostgreSQL 쿼리 튜닝, JVM 메모리·CPU 분석, Node.js 기반 서비스의 실시간 협업 정합성 문제를 다뤄 왔습니다.</p>
 
 <p>성균관대학교에서 기계공학과 소프트웨어학을 함께 공부했고, 지금도 시스템이 <em>왜</em> 그렇게 동작하는지 파고드는 것을 좋아합니다.</p>
 
-<ul>
-  <li>블로그: 원인까지 추적한 트러블슈팅 기록과 사이드 프로젝트 이야기 → <a href="/blog/">blog</a></li>
-  <li>프로젝트: 학교·부트캠프 프로젝트와 개인 사이드 프로젝트 → <a href="/projects/">projects</a></li>
-</ul>
 
           </div>
 
@@ -362,9 +366,8 @@ Fluid Mechanics
       
     </div>
 
-    <!-- Footer -->    
-    <footer class="fixed-bottom">
-      <div class="container mt-0">
+    <!-- Footer -->    <footer class="sticky-bottom mt-5">
+      <div class="container">
         &copy; Copyright 2026 Hyeonwon  Seo. Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
 
       </div>
