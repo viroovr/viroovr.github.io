@@ -222,6 +222,11 @@ blockquote {
 .profile {
   width: 100%;
 }
+.profile img.rounded-circle {
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  object-position: top;
+}
 .profile .address {
   margin-bottom: 5px;
   margin-top: 5px;

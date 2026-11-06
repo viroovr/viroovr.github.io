@@ -11,8 +11,42 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>projects | Hyeonwon  Seo</title>
     <meta name="author" content="Hyeonwon  Seo" />
-    <meta name="description" content="A growing collection of cool projects." />
-    <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website" />
+    <meta name="description" content="개인 사이드 프로젝트와 학교·부트캠프 프로젝트" />
+    <meta name="keywords" content="backend, java, spring, postgresql, troubleshooting, portfolio, tech-blog" />
+
+    <!-- OpenGraph -->
+    <meta property="og:site_name" content="Hyeonwon  Seo" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Hyeonwon  Seo | projects" />
+    <meta property="og:url" content="https://viroovr.github.io/projects/" />
+    <meta property="og:description" content="개인 사이드 프로젝트와 학교·부트캠프 프로젝트" />
+    <meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+    <meta property="og:locale" content="ko" />
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="projects" />
+    <meta name="twitter:description" content="개인 사이드 프로젝트와 학교·부트캠프 프로젝트" />
+    <meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+    
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+      {
+        "author":
+        {
+          "@type": "Person",
+          "name": "Hyeonwon  Seo"
+        },
+        "url": "https://viroovr.github.io/projects/",
+        "@type": "WebSite",
+        "description": "개인 사이드 프로젝트와 학교·부트캠프 프로젝트",
+        "headline": "projects",
+        "sameAs": ["https://github.com/viroovr"],
+        "name": "Hyeonwon  Seo",
+        "@context": "https://schema.org"
+      }
+    </script>
 
 
     <!-- Bootstrap & MDB -->
@@ -117,14 +151,44 @@
 
           <header class="post-header">
             <h1 class="post-title">projects</h1>
-            <p class="post-description">A growing collection of cool projects.</p>
+            <p class="post-description">개인 사이드 프로젝트와 학교·부트캠프 프로젝트</p>
           </header>
 
           <article>
             <!-- pages/projects.md -->
 <div class="projects">
   <!-- Display categorized projects -->
-  <h2 class="category">work</h2>
+  <h2 class="category">side</h2>
+  <!-- Generate cards for each project -->
+  <div class="grid"><!-- _includes/projects.html -->
+<div class="grid-sizer"></div>
+<div class="grid-item">
+  <a href="/projects/4_project/">
+      <div class="card hoverable">
+        <div class="card-body">
+          <h2 class="card-title text-lowercase">개인 투자 대시보드</h2>
+          <p class="card-text">코인·국내주식·해외 지수를 한 화면에서 보는 1인용 로컬 웹 콘솔</p>
+          <div class="row ml-1 mr-1 p-0">
+          </div>
+        </div>
+      </div>
+    </a>
+</div><!-- _includes/projects.html -->
+<div class="grid-sizer"></div>
+<div class="grid-item">
+  <a href="/projects/5_project/">
+      <div class="card hoverable">
+        <div class="card-body">
+          <h2 class="card-title text-lowercase">자소서 전문가 패널</h2>
+          <p class="card-text">업계 전문가 3인의 관점으로 검토하고 편집장 에이전트가 고쳐 쓰는 LLM 웹앱</p>
+          <div class="row ml-1 mr-1 p-0">
+          </div>
+        </div>
+      </div>
+    </a>
+</div>
+  </div>
+  <h2 class="category">school</h2>
   <!-- Generate cards for each project -->
   <div class="grid"><!-- _includes/projects.html -->
 <div class="grid-sizer"></div>
@@ -199,10 +263,6 @@
       </div>
     </a>
 </div>
-  </div>
-  <h2 class="category">fun</h2>
-  <!-- Generate cards for each project -->
-  <div class="grid">
   </div></div>
 
           </article>
@@ -215,7 +275,7 @@
     <!-- Footer -->    
     <footer class="fixed-bottom">
       <div class="container mt-0">
-        &copy; Copyright 2024 Hyeonwon  Seo. Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
+        &copy; Copyright 2026 Hyeonwon  Seo. Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
 
       </div>
     </footer>

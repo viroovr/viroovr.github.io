@@ -11,9 +11,46 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Hyeonwon  Seo</title>
     <meta name="author" content="Hyeonwon  Seo" />
-    <meta name="description" content="A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+    <meta name="description" content="백엔드 개발자 서현원의 포트폴리오와 기술 블로그. 운영 장애 추적, 성능 개선, 사이드 프로젝트 기록.
 " />
-    <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website" />
+    <meta name="keywords" content="backend, java, spring, postgresql, troubleshooting, portfolio, tech-blog" />
+
+    <!-- OpenGraph -->
+    <meta property="og:site_name" content="Hyeonwon  Seo" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Hyeonwon  Seo | about" />
+    <meta property="og:url" content="https://viroovr.github.io/" />
+    <meta property="og:description" content="백엔드 개발자 서현원의 포트폴리오와 기술 블로그. 운영 장애 추적, 성능 개선, 사이드 프로젝트 기록.
+" />
+    <meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+    <meta property="og:locale" content="ko" />
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="about" />
+    <meta name="twitter:description" content="백엔드 개발자 서현원의 포트폴리오와 기술 블로그. 운영 장애 추적, 성능 개선, 사이드 프로젝트 기록.
+" />
+    <meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+    
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+      {
+        "author":
+        {
+          "@type": "Person",
+          "name": "Hyeonwon  Seo"
+        },
+        "url": "https://viroovr.github.io/",
+        "@type": "WebSite",
+        "description": "백엔드 개발자 서현원의 포트폴리오와 기술 블로그. 운영 장애 추적, 성능 개선, 사이드 프로젝트 기록.
+",
+        "headline": "about",
+        "sameAs": ["https://github.com/viroovr"],
+        "name": "Hyeonwon  Seo",
+        "@context": "https://schema.org"
+      }
+    </script>
 
 
     <!-- Bootstrap & MDB -->
@@ -119,7 +156,7 @@
           <h1 class="post-title">
            <span class="font-weight-bold">Hyeonwon</span>  Seo
           </h1>
-          <p class="desc">Undergraduate. @<a href='https://www.skku.edu/'>SKKU</a>. System Software</p>
+          <p class="desc">Backend Developer @ <a href='https://flow.team'>Flow</a></p>
         </header>
 
         <article>
@@ -151,41 +188,55 @@
 </figure>
 
             <div class="address">
-              <p>16419 SKKU</p> <p>svhost1466@skku.edu</p>
+              <p>tjgusdnjs789@gmail.com</p>
             </div>
           </div>
 
           <div class="clearfix">
-            <p>Hi, I am Hyeonwon Seo, an undergraduate student at SKKU, majoring in <a href="http://mech.skku.edu/">Mechanical Engineering</a> and double majoring in <a href="https://sw.skku.edu/sw/">Software Engineering</a>.</p>
+            <p>안녕하세요, 협업툴 <a href="https://flow.team">Flow</a>에서 백엔드 개발을 하고 있는 서현원입니다.</p>
 
-<p>My interest in mechanical complexity and inherent engineering led me to Mechanical Engineering, while my passion for computers from Data structure, Algorithm, Operating system classes drove me to additionally pursue Software Engineering.</p>
+<p>운영 중 생기는 장애와 성능 문제를 <strong>증상 → 관측 → 원인 → 수정 → 검증</strong> 순서로 끝까지 추적하는 일을 주로 합니다.
+Java/Spring 기반 WAS, PostgreSQL 쿼리 튜닝, JVM 메모리·CPU 분석, Node.js 기반 서비스의 실시간 협업 정합성 문제를 다뤄 왔습니다.</p>
 
-<p>I am still in pursuit of more substantial knowledge and outcomes, maintaining a keen interest in system design and analysis.</p>
+<p>성균관대학교에서 기계공학과 소프트웨어학을 함께 공부했고, 지금도 시스템이 <em>왜</em> 그렇게 동작하는지 파고드는 것을 좋아합니다.</p>
 
-<!-- Link to your favorite [subreddit](http://reddit.com). You can put a picture in, too. The code is already in, just name your picture `prof_pic.jpg` and put it in the `img/` folder. -->
-
-<!-- Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page](/al-folio/publications/) automatically. -->
-
-<!-- Link to your social media connections, too. This theme is set up to use [Font Awesome icons](http://fortawesome.github.io/Font-Awesome/) and [Academicons](https://jpswalsh.github.io/academicons/), like the ones below. Add your Facebook, Twitter, LinkedIn, Google Scholar, or just disable all of them. -->
+<ul>
+  <li>블로그: 원인까지 추적한 트러블슈팅 기록과 사이드 프로젝트 이야기 → <a href="/blog/">blog</a></li>
+  <li>프로젝트: 학교·부트캠프 프로젝트와 개인 사이드 프로젝트 → <a href="/projects/">projects</a></li>
+</ul>
 
           </div>
 
           <!-- News -->
           <h2><a style="color: inherit;">Skills</a></h2>          <div class="news">
-            <div class="table-responsive" >
+            <div class="table-responsive" style="max-height: 60vw">
               <table class="table table-sm table-borderless">
               
                 <tr>
-                  <th scope="row">C/C++</th>
+                  <th scope="row">Java / Spring</th>
                   <td>
-                    System Programming
+                    WAS 백엔드, JVM 프로파일링(async-profiler, jmap), GC 분석
 
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">Python</th>
+                  <th scope="row">PostgreSQL</th>
                   <td>
-                    Django. PyTorch.
+                    쿼리 튜닝, 실행계획 분석, 인덱스 설계
+
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">TypeScript / Node.js</th>
+                  <td>
+                    NestJS, 실시간 협업(Yjs/WebSocket)
+
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Infra / Tools</th>
+                  <td>
+                    AWS(EC2, ECS, ALB), Docker, GitHub Actions, Python 자동화
 
                   </td>
                 </tr>
@@ -194,49 +245,38 @@
           </div>
 
           <!-- Latest posts -->
-          <h2><a  style="color: inherit;">Education</a></h2>          <div class="education">
+          <h2><a href="/blog/" style="color: inherit;">Latest posts</a></h2>
+          <div class="news">
             <div class="table-responsive" >
               <table class="table table-sm table-borderless">
               
                 <tr>
-                  <th scope="row">Jangsung High School</th>
+                  <th scope="row">Nov 6, 2026</th>
                   <td>
-                    
-
+                    <a class="news-title" href="/blog/2026/restart/">블로그를 다시 시작하며</a>
                   </td>
-                  <td>2014</td>
-                </tr>
-                <tr>
-                  <th scope="row">Mechanical Engineering. SKKU</th>
-                  <td>
-                    Statics,
-Dynamics,
-Mechanics of Materials,
-Fluid Mechanics
-
-                  </td>
-                  <td>2019</td>
-                </tr>
-                <tr>
-                  <th scope="row">Software Engineering. SKKU</th>
-                  <td>
-                    Data Structure, Algorithm, Operating System, System Programming
-
-                  </td>
-                  <td>2022</td>
                 </tr>
               </table>
             </div>
           </div>
 
-          <h2><a  style="color: inherit;">Achievements and Certifications</a></h2>          <div class="achievement">
-            <div class="table-responsive" >
+
+          <h2><a  style="color: inherit;">Experience</a></h2>          <div class="achievement">
+            <div class="table-responsive" style="max-height: 60vw">
               <table class="table table-sm table-borderless">
               
                 <tr>
-                  <th scope="row">SKKU Boot Camp</th>
+                  <th scope="row">Flow — Backend Developer</th>
                   <td>
-                    
+                    협업툴 Flow 백엔드 개발 (Java/Spring WAS, PostgreSQL, Node.js 위키 서비스). 운영 장애 분석과 성능 개선
+
+                  </td>
+                  <td>2026</td>
+                </tr>
+                <tr>
+                  <th scope="row">SKKUEXS Backend Developer</th>
+                  <td>
+                    Capstone Project
 
                   </td>
                   <td>2023</td>
@@ -250,12 +290,47 @@ Fluid Mechanics
                   <td>2023</td>
                 </tr>
                 <tr>
-                  <th scope="row">SKKUEXS Backend Developer</th>
+                  <th scope="row">SKKU Boot Camp</th>
                   <td>
-                    Capstone Project
+                    
 
                   </td>
                   <td>2023</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <h2><a  style="color: inherit;">Education</a></h2>          <div class="education">
+            <div class="table-responsive" >
+              <table class="table table-sm table-borderless">
+              
+                <tr>
+                  <th scope="row">Software Engineering. SKKU</th>
+                  <td>
+                    Data Structure, Algorithm, Operating System, System Programming
+
+                  </td>
+                  <td>2022</td>
+                </tr>
+                <tr>
+                  <th scope="row">Mechanical Engineering. SKKU</th>
+                  <td>
+                    Statics,
+Dynamics,
+Mechanics of Materials,
+Fluid Mechanics
+
+                  </td>
+                  <td>2019</td>
+                </tr>
+                <tr>
+                  <th scope="row">Jangsung High School</th>
+                  <td>
+                    
+
+                  </td>
+                  <td>2014</td>
                 </tr>
               </table>
             </div>
@@ -268,14 +343,14 @@ Fluid Mechanics
             <div class="social">
               <div class="contact-icons">
                 <a href="mailto:%74%6A%67%75%73%64%6E%6A%73%37%38%39@%67%6D%61%69%6C.%63%6F%6D" title="email"><i class="fas fa-envelope"></i></a>
-            <a href="tel:8201012345678" title="phone"><i class="fab fa-whatsapp"></i></a>
             <a href="https://github.com/viroovr" title="GitHub"><i class="fab fa-github"></i></a>
+            <a href="/feed.xml" title="RSS Feed"><i class="fas fa-rss-square"></i></a>
             
 
               </div>
 
               <div class="contact-note">
-                Please contact me whenever you have questions.
+                궁금한 점이나 협업 제안은 메일로 편하게 연락 주세요.
 
               </div>
 
@@ -290,7 +365,7 @@ Fluid Mechanics
     <!-- Footer -->    
     <footer class="fixed-bottom">
       <div class="container mt-0">
-        &copy; Copyright 2024 Hyeonwon  Seo. Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
+        &copy; Copyright 2026 Hyeonwon  Seo. Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
 
       </div>
     </footer>
