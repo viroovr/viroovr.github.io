@@ -2,10 +2,10 @@
 layout: page
 title: projects
 permalink: /projects/
-description: A growing collection of cool projects.
+description: 개인 사이드 프로젝트와 학교·부트캠프 프로젝트
 nav: true
 nav_order: 2
-display_categories: [work, fun]
+display_categories: [side, school]
 horizontal: false
 ---
 

@@ -1,9 +1,8 @@
 ---
 layout: post
-date: 2002-11-07 16:11:00-0400
+date: 2001-10-23 15:59:00-0400
 inline: true
 related_posts: false
-my_name: "Python"
+my_name: "PostgreSQL"
 ---
-
-Django. PyTorch.
+쿼리 튜닝, 실행계획 분석, 인덱스 설계

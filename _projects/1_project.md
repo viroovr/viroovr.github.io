@@ -4,7 +4,7 @@ title: 장애물 극복 및 험지에서 사용 가능한 모바일 로봇 플�
 description: Urp Winter Research
 img: assets/img/1.png
 importance: 3
-category: work
+category: school
 ---
 
 1. 연구목적
