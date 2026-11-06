@@ -1,0 +1,62 @@
+---
+layout: default
+---
+{%- assign me = site.data.profile -%}
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">{{ me.role }} @ <a href="{{ me.company_url }}" rel="noopener">{{ me.company }}</a></p>
+    <h1>{{ me.name }} <span class="muted">{{ me.name_en }}</span></h1>
+    {%- for line in me.intro %}
+    <p class="lead">{{ line | markdownify | remove: '<p>' | remove: '</p>' | strip }}</p>
+    {%- endfor %}
+    <div class="actions">
+      <a class="btn primary" href="{{ '/blog/' | relative_url }}">블로그 읽기</a>
+      <a class="btn" href="{{ '/projects/' | relative_url }}">프로젝트</a>
+      <a class="btn ghost" href="https://github.com/{{ me.github }}" rel="noopener">GitHub ↗</a>
+      <a class="btn ghost" href="mailto:{{ me.email }}">메일</a>
+    </div>
+  </div>
+  <img class="avatar" src="{{ me.photo | relative_url }}" alt="{{ me.name }} 프로필 사진" width="180" height="180">
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>최근 글</h2><a href="{{ '/blog/' | relative_url }}">전체 보기 →</a></div>
+  {%- if site.posts.size > 0 %}
+  <ul class="post-list">
+    {%- for post in site.posts limit: 5 %}
+    {% include post-item.html post=post %}
+    {%- endfor %}
+  </ul>
+  {%- else %}
+  <p class="muted">아직 글이 없어요.</p>
+  {%- endif %}
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>프로젝트</h2><a href="{{ '/projects/' | relative_url }}">전체 보기 →</a></div>
+  {%- assign side = site.projects | where: "category", "side" | sort: "importance" %}
+  <div class="cards">
+    {%- for project in side limit: 4 %}
+    {% include project-card.html project=project %}
+    {%- endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <h2>경력</h2>
+  {% include timeline.html items=me.experience %}
+</section>
+
+<section class="section">
+  <h2>기술</h2>
+  <dl class="skills">
+    {%- for s in me.skills %}
+    <div><dt>{{ s.name }}</dt><dd>{{ s.detail }}</dd></div>
+    {%- endfor %}
+  </dl>
+</section>
+
+<section class="section">
+  <h2>학력</h2>
+  {% include timeline.html items=me.education %}
+</section>

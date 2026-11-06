@@ -1,23 +1,14 @@
 ---
 layout: default
 ---
-<!-- page.html -->
-        <div class="post">
-
-          <header class="post-header">
-            <h1 class="post-title">{{ page.title }}</h1>
-            <p class="post-description">{{ page.description }}</p>
-            {%- if page.stack %}
-            <ul class="stack-chips">{% for s in page.stack %}<li>{{ s }}</li>{% endfor %}</ul>
-            {%- endif %}
-          </header>
-
-          <article>
-            {{ content }}
-          </article>
-
-          {%- if page.collection == "projects" %}
-          <p class="back-link"><a href="{{ '/projects/' | relative_url }}">&larr; 프로젝트 목록</a></p>
-          {%- endif %}
-
-        </div>
+<article class="article">
+  <header class="article-head">
+    {%- if page.collection == "projects" %}<a class="back" href="{{ '/projects/' | relative_url }}">← 프로젝트</a>{% endif %}
+    <h1>{{ page.title }}</h1>
+    {%- if page.description %}<p class="lead">{{ page.description }}</p>{% endif %}
+    {% include stack.html items=page.stack %}
+  </header>
+  <div class="prose">
+    {{ content }}
+  </div>
+</article>

@@ -1,12 +1,12 @@
 /* 블로그 어드민 — 사이트 테마와 분리된 단독 스타일 */
 :root {
   --bg: #f7f7f8; --panel: #fff; --text: #1d1d1f; --muted: #6e6e73; --line: #e3e3e6;
-  --accent: #b509ac; --accent-text: #fff; --ok: #1a7f37; --err: #c62828; --warn: #9a6700; --busy: #0969da;
+  --accent: #4f46e5; --accent-text: #fff; --ok: #1a7f37; --err: #c62828; --warn: #9a6700; --busy: #0969da;
   --code: #f2f2f4; --radius: 10px;
 }
 @media (prefers-color-scheme: dark) {
   :root { --bg: #161618; --panel: #1f1f22; --text: #ececf0; --muted: #a0a0a8; --line: #33333a;
-    --accent: #2698ba; --code: #2a2a30; --ok: #3fb950; --err: #f85149; --warn: #d29922; --busy: #58a6ff; }
+    --accent: #8b93ff; --accent-text: #0d0d1a; --code: #2a2a30; --ok: #3fb950; --err: #f85149; --warn: #d29922; --busy: #58a6ff; }
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }

@@ -1,0 +1,44 @@
+# 홈 화면 내용. 순서대로 표시된다.
+name: 서현원
+name_en: Hyeonwon Seo
+role: Backend Developer
+company: Flow
+company_url: https://flow.team
+photo: /assets/img/my_pic.jpg
+email: tjgusdnjs789@gmail.com
+github: viroovr
+
+intro:
+  - 협업툴 Flow 에서 백엔드 개발을 하고 있습니다.
+  - 운영 중 생기는 장애와 성능 문제를 **증상 → 관측 → 원인 → 수정 → 검증** 순서로 끝까지 추적하는 일을 주로 합니다. Java/Spring 기반 WAS, PostgreSQL 쿼리 튜닝, JVM 메모리·CPU 분석, Node.js 기반 서비스의 실시간 협업 정합성 문제를 다뤄 왔습니다.
+  - 성균관대학교에서 기계공학과 소프트웨어학을 함께 공부했고, 시스템이 *왜* 그렇게 동작하는지 파고드는 것을 좋아합니다.
+
+skills:
+  - name: Java / Spring
+    detail: WAS 백엔드, JVM 프로파일링(async-profiler, jmap), GC 분석
+  - name: PostgreSQL
+    detail: 쿼리 튜닝, 실행계획 분석, 인덱스 설계
+  - name: TypeScript / Node.js
+    detail: NestJS, 실시간 협업(Yjs/WebSocket)
+  - name: Infra / Tools
+    detail: AWS(EC2, ECS, ALB), Docker, GitHub Actions, Python 자동화
+
+experience:
+  - title: Flow — Backend Developer
+    period: 2026 –
+    detail: 협업툴 Flow 백엔드 개발 (Java/Spring WAS, PostgreSQL, Node.js 위키 서비스). 운영 장애 분석과 성능 개선
+  - title: SKKUEXS — Backend Developer
+    period: 2023
+    detail: 교환학생 지원 플랫폼 캡스톤 프로젝트
+  - title: SKKU DNA Hero Team
+    period: 2023
+  - title: SKKU Boot Camp
+    period: 2023
+
+education:
+  - title: 성균관대학교 소프트웨어학 (복수전공)
+    period: 2022
+    detail: 자료구조, 알고리즘, 운영체제, 시스템 프로그래밍
+  - title: 성균관대학교 기계공학
+    period: 2019
+    detail: 정역학, 동역학, 재료역학, 유체역학

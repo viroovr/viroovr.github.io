@@ -1,0 +1,8 @@
+{%- assign post = include.post -%}
+<li class="post-item" data-tags="{{ post.tags | join: ' ' }}">
+  <a href="{{ post.url | relative_url }}">
+    <span class="post-item-title">{{ post.title }}</span>
+    {%- if post.description %}<span class="post-item-desc">{{ post.description }}</span>{% endif %}
+  </a>
+  <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+</li>

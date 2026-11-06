@@ -2,7 +2,7 @@
 layout: page
 title: DICOM 기반 동영상 Labeling 효율성 향상을 위한 방안 연구 및 구현
 description: K-Software Empowerment Bootcamp Team "InsightMedi"
-img: assets/img/2_dicom_project.png
+img: assets/img/2_dicom_project.jpg
 importance: 2
 category: school
 stack: [Python, OpenCV, Object Tracking]
