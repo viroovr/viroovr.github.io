@@ -4,7 +4,7 @@ title: Providing Support for Exchange Students at SKKU, SKKUEXS
 description: Capstone Design Project, Sungkyunkwan University
 img: assets/img/3_skkuexs.png
 importance: 1
-category: work
+category: school
 ---
 
 1 . Introduction
