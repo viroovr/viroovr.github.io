@@ -1,0 +1,11 @@
+<ol class="timeline">
+  {%- for it in include.items %}
+  <li>
+    <span class="when">{{ it.period }}</span>
+    <div>
+      <strong>{{ it.title }}</strong>
+      {%- if it.detail %}<p>{{ it.detail }}</p>{% endif %}
+    </div>
+  </li>
+  {%- endfor %}
+</ol>

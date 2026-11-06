@@ -1,0 +1,25 @@
+---
+layout: default
+title: 프로젝트
+permalink: /projects/
+---
+<header class="page-head">
+  <h1>프로젝트</h1>
+  <p class="lead">직접 쓰려고 만든 사이드 프로젝트와 학교·부트캠프에서 한 프로젝트</p>
+</header>
+
+{%- assign groups = "side:사이드 프로젝트,school:학교 · 부트캠프" | split: "," %}
+{%- for g in groups %}
+{%- assign key = g | split: ":" | first %}
+{%- assign items = site.projects | where: "category", key | sort: "importance" %}
+{%- if items.size > 0 %}
+<section class="section">
+  <h2>{{ g | split: ":" | last }}</h2>
+  <div class="cards">
+    {%- for project in items %}
+    {% include project-card.html project=project %}
+    {%- endfor %}
+  </div>
+</section>
+{%- endif %}
+{%- endfor %}
