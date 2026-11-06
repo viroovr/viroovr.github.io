@@ -4,6 +4,7 @@ title: 자소서 전문가 패널
 description: 업계 전문가 3인의 관점으로 검토하고 편집장 에이전트가 고쳐 쓰는 LLM 웹앱
 importance: 2
 category: side
+stack: [Python, Claude API, Firestore, Cloud Run]
 ---
 
 ## 무엇을 만들었나
@@ -14,4 +15,3 @@ category: side
 - Google 로그인 + 허용 이메일 목록, 계정별 일일 한도
 - Google Cloud Run(서울 리전)에 배포해 요청이 없을 때 인스턴스 0 → 소규모 사용은 무료 범위
 
-**Stack** Python · Claude API · Firestore · Cloud Run

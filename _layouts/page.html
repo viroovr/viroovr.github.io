@@ -7,10 +7,17 @@ layout: default
           <header class="post-header">
             <h1 class="post-title">{{ page.title }}</h1>
             <p class="post-description">{{ page.description }}</p>
+            {%- if page.stack %}
+            <ul class="stack-chips">{% for s in page.stack %}<li>{{ s }}</li>{% endfor %}</ul>
+            {%- endif %}
           </header>
 
           <article>
             {{ content }}
           </article>
+
+          {%- if page.collection == "projects" %}
+          <p class="back-link"><a href="{{ '/projects/' | relative_url }}">&larr; 프로젝트 목록</a></p>
+          {%- endif %}
 
         </div>

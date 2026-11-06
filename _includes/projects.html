@@ -13,8 +13,11 @@
           alt="project thumbnail" -%}
         {%- endif %}
         <div class="card-body">
-          <h2 class="card-title text-lowercase">{{ project.title }}</h2>
+          <h2 class="card-title">{{ project.title }}</h2>
           <p class="card-text">{{ project.description }}</p>
+          {%- if project.stack %}
+          <ul class="stack-chips">{% for s in project.stack %}<li>{{ s }}</li>{% endfor %}</ul>
+          {%- endif %}
           <div class="row ml-1 mr-1 p-0">
             {%- if project.github -%}
             <div class="github-icon">
