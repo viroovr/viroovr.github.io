@@ -59,8 +59,16 @@
   <p class="lead">문제를 원인까지 추적한 기록</p>
 </header>
 <div class="tag-filter" role="group" aria-label="태그로 거르기">
-  <button type="button" class="tag-btn" aria-pressed="true" data-tag="">전체 <span>1</span></button>
+  <button type="button" class="tag-btn" aria-pressed="true" data-tag="">전체 <span>10</span></button>
+  <button type="button" class="tag-btn" aria-pressed="false" data-tag="backend">#backend <span>2</span></button>
+  <button type="button" class="tag-btn" aria-pressed="false" data-tag="frontend">#frontend <span>2</span></button>
+  <button type="button" class="tag-btn" aria-pressed="false" data-tag="infra">#infra <span>2</span></button>
+  <button type="button" class="tag-btn" aria-pressed="false" data-tag="jvm">#jvm <span>2</span></button>
+  <button type="button" class="tag-btn" aria-pressed="false" data-tag="performance">#performance <span>6</span></button>
+  <button type="button" class="tag-btn" aria-pressed="false" data-tag="postgresql">#postgresql <span>2</span></button>
   <button type="button" class="tag-btn" aria-pressed="false" data-tag="retrospective">#retrospective <span>1</span></button>
+  <button type="button" class="tag-btn" aria-pressed="false" data-tag="security">#security <span>1</span></button>
+  <button type="button" class="tag-btn" aria-pressed="false" data-tag="troubleshooting">#troubleshooting <span>9</span></button>
 </div>
 <section class="year-group">
   <h2 class="year">2026</h2>
@@ -70,6 +78,69 @@
     <span class="post-item-title">블로그를 다시 시작하며</span><span class="post-item-desc">학부생 때 만들어 두고 멈춘 블로그를, 개발자로서 다시 엽니다</span>
   </a>
   <time datetime="2026-11-06T09:00:00+09:00">2026.11.06</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance jvm">
+  <a href="/blog/2026/jvm-context-leak-full-gc/">
+    <span class="post-item-title">CPU 100% 의 정체는 Full GC — 닫히지 않은 요청 컨텍스트 368만 개 추적기</span><span class="post-item-desc">sar → jstat → jmap → javap 순서로 좁혀 들어가 한 줄로 고친 메모리 누수, 그리고 누수 속도로 재발 시점을 예측한 이야기</span>
+  </a>
+  <time datetime="2026-10-23T21:00:00+09:00">2026.10.23</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance jvm">
+  <a href="/blog/2026/json-serializer-quadratic-cpu/">
+    <span class="post-item-title">형제 노드보다 CPU 가 3배 — JSON 직렬화기의 제곱 비용 찾기</span><span class="post-item-desc">같은 역할의 서버 두 대를 비교해 원인을 좁히고, 이미 만들어져 있던 수정을 운영까지 끌고 간 기록</span>
+  </a>
+  <time datetime="2026-10-22T21:00:00+09:00">2026.10.22</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance postgresql">
+  <a href="/blog/2026/or-filter-lateral-timeout/">
+    <span class="post-item-title">필터 하나 더했더니 35초 타임아웃 — OR 조건과 LATERAL 쿼리 플랜 추적기</span><span class="post-item-desc">그룹화 화면이 무한 로딩에 빠진 원인을 실행 계획에서 찾고, 35초 타임아웃을 64ms 로 줄인 과정</span>
+  </a>
+  <time datetime="2026-10-01T21:00:00+09:00">2026.10.01</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance infra">
+  <a href="/blog/2026/thumbnail-30s-cache-key-limit/">
+    <span class="post-item-title">썸네일이 정확히 30초 — 캐시 용량이 아니라 키 인덱스가 꽉 차 있었다</span><span class="post-item-desc">30초 타임아웃 밴드에서 출발해 이미지 변환 서버의 nginx 캐시 keys_zone 상한을 찾아내고, 계층별 타임아웃을 다시 맞춘 기록</span>
+  </a>
+  <time datetime="2026-08-28T21:00:00+09:00">2026.08.28</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting postgresql backend">
+  <a href="/blog/2026/sort-order-tie-break/">
+    <span class="post-item-title">새로고침할 때마다 순서가 바뀐다 — 정렬 키 중복과 tie-break 없는 ORDER BY</span><span class="post-item-desc">드래그로 옮긴 페이지가 됐다 안 됐다 하던 문제를, 운영 데이터에서 중복 정렬 키를 확인하고 읽기·이동·생성·정리 네 겹으로 막은 기록</span>
+  </a>
+  <time datetime="2026-07-06T21:00:00+09:00">2026.07.06</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance infra">
+  <a href="/blog/2026/socket-ephemeral-port-exhaustion/">
+    <span class="post-item-title">CPU 99% 인데 범인은 CPU 가 아니었다 — 소켓 서버의 임시 포트 고갈</span><span class="post-item-desc">nginx 가 CPU 를 다 쓰던 실시간 서버 장애를, 코드 한 줄 없이 커널 네트워크 설정으로 푼 과정과 그 설정이 조용히 사라진 후일담</span>
+  </a>
+  <time datetime="2026-06-17T21:00:00+09:00">2026.06.17</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance frontend">
+  <a href="/blog/2026/keydown-forced-reflow/">
+    <span class="post-item-title">키 하나에 19ms — 입력 지연을 만든 범인은 애니메이션이 아니라 :visible 이었다</span><span class="post-item-desc">Performance 트레이스를 이벤트 구간 단위로 쪼개 보고, jQuery :visible 이 만든 강제 리플로우를 찾아낸 과정</span>
+  </a>
+  <time datetime="2026-05-20T21:00:00+09:00">2026.05.20</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting security backend">
+  <a href="/blog/2026/ghost-session-sampling-check/">
+    <span class="post-item-title">쫓아낸 기기가 계속 로그인돼 있다 — 1/1000 샘플링 검증이 만든 유령 세션</span><span class="post-item-desc">DB 에서는 차단된 기기가 세션으로는 계속 API 를 호출하던 문제를, 30초 TTL 세션 캐시로 결정적으로 막고 부하 테스트로 비용을 확인한 과정</span>
+  </a>
+  <time datetime="2026-04-30T21:00:00+09:00">2026.04.30</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting frontend">
+  <a href="/blog/2026/ime-slash-command-double-run/">
+    <span class="post-item-title">한글로 쳤더니 페이지가 2개 — IME 조합 이벤트와 이중 실행 경로</span><span class="post-item-desc">같은 IME 문제를 두 레이어가 각자 해결하고 있어서, compositionend 한 번에 명령이 두 번 실행된 이야기</span>
+  </a>
+  <time datetime="2026-03-30T21:00:00+09:00">2026.03.30</time>
 </li>
 
   </ul>

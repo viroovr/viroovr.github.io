@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<!-- Begin Jekyll SEO tag v2.9.1 -->
+<title>쫓아낸 기기가 계속 로그인돼 있다 — 1/1000 샘플링 검증이 만든 유령 세션 | 서현원</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="쫓아낸 기기가 계속 로그인돼 있다 — 1/1000 샘플링 검증이 만든 유령 세션" />
+<meta name="author" content="서현원" />
+<meta property="og:locale" content="ko" />
+<meta name="description" content="DB 에서는 차단된 기기가 세션으로는 계속 API 를 호출하던 문제를, 30초 TTL 세션 캐시로 결정적으로 막고 부하 테스트로 비용을 확인한 과정" />
+<meta name="twitter:description" property="og:description" content="DB 에서는 차단된 기기가 세션으로는 계속 API 를 호출하던 문제를, 30초 TTL 세션 캐시로 결정적으로 막고 부하 테스트로 비용을 확인한 과정" />
+<link rel="canonical" href="https://viroovr.github.io/blog/2026/ghost-session-sampling-check/" />
+<meta property="og:url" content="https://viroovr.github.io/blog/2026/ghost-session-sampling-check/" />
+<meta property="og:site_name" content="서현원" />
+<meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-04-30T21:00:00+09:00" />
+<meta property="article:modified_time" content="2026-04-30T21:00:00+09:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta name="twitter:title" content="쫓아낸 기기가 계속 로그인돼 있다 — 1/1000 샘플링 검증이 만든 유령 세션" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"서현원"},"dateModified":"2026-04-30T21:00:00+09:00","datePublished":"2026-04-30T21:00:00+09:00","description":"DB 에서는 차단된 기기가 세션으로는 계속 API 를 호출하던 문제를, 30초 TTL 세션 캐시로 결정적으로 막고 부하 테스트로 비용을 확인한 과정","headline":"쫓아낸 기기가 계속 로그인돼 있다 — 1/1000 샘플링 검증이 만든 유령 세션","image":"https://viroovr.github.io/assets/img/my_pic.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://viroovr.github.io/blog/2026/ghost-session-sampling-check/"},"url":"https://viroovr.github.io/blog/2026/ghost-session-sampling-check/"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link type="application/atom+xml" rel="alternate" href="https://viroovr.github.io/feed.xml" title="서현원" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234f46e5%22/><text x=%2250%22 y=%2268%22 font-size=%2256%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22700%22>현</text></svg>">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script>
+  // 테마: 저장값 > OS 설정. 깜빡임 없게 head 에서 먼저 적용
+  (function () {
+    var t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+  })();
+</script>
+
+</head>
+<body class="post">
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">서현원</a>
+    <nav class="nav" aria-label="주요 메뉴"><a href="/blog/" aria-current="page">블로그</a>
+      <a href="/projects/" >프로젝트</a>
+      <button class="theme-toggle" type="button" aria-label="다크 모드 전환" title="다크 모드 전환">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+  <main id="main" class="wrap">
+    <article class="article">
+  <header class="article-head">
+    <a class="back" href="/blog/">← 블로그</a>
+    <h1>쫓아낸 기기가 계속 로그인돼 있다 — 1/1000 샘플링 검증이 만든 유령 세션</h1><p class="lead">DB 에서는 차단된 기기가 세션으로는 계속 API 를 호출하던 문제를, 30초 TTL 세션 캐시로 결정적으로 막고 부하 테스트로 비용을 확인한 과정</p>
+    <p class="meta">
+      <time datetime="2026-04-30T21:00:00+09:00">2026년 4월 30일</time>
+      · 4분 읽기 · <a class="tag" href="/blog/?tag=troubleshooting">#troubleshooting</a> · <a class="tag" href="/blog/?tag=security">#security</a> · <a class="tag" href="/blog/?tag=backend">#backend</a>
+    </p>
+  </header>
+  <div class="prose">
+    <h2 id="증상">증상</h2>
+
+<p>“중복 로그인 방지” 정책을 켠 환경에서, 다른 기기로 로그인하면 기존 기기는 서버 DB 에서 <strong>사용 중지</strong>(<code class="language-plaintext highlighter-rouge">use_yn='N'</code>)로 바뀝니다. 그런데 그 기기의 브라우저 세션은 살아 있어서, 글 쓰기나 프로젝트 생성 같은 일반 API 가 <strong>계속 200 으로 통과</strong>했습니다.</p>
+
+<p>더 곤란한 점은 기기 관리 화면이 “사용 중이고 최근 접속한 기기”만 보여준다는 것이었습니다. 무효화된 기기는 목록에서 사라지니, 사용자도 관리자도 이 상태를 볼 수 없었습니다. DB 상태는 “차단”, 실제 접근은 “허용”. 보안 관점에서 어긋난 상태였습니다.</p>
+
+<h2 id="재현">재현</h2>
+
+<ol>
+  <li>기기 B 브라우저에서 로그인하고 탭을 닫는다.</li>
+  <li>기기 A 로 로그인한다 → B 의 기기 인증이 <code class="language-plaintext highlighter-rouge">N</code> 이 된다.</li>
+  <li>B 에서 탭을 다시 연다 → 화면도 API 도 정상 동작한다.</li>
+</ol>
+
+<p>DB 의 B 레코드는 <code class="language-plaintext highlighter-rouge">N</code> 이었고 이후 갱신도 없었습니다. 그런데 요청은 통과했습니다.</p>
+
+<h2 id="원인-추적">원인 추적</h2>
+
+<h3 id="서버는-왜-못-막았나">서버는 왜 못 막았나</h3>
+
+<p>요청 필터는 세션 쿠키와 사용자 ID 가 맞는지만 확인했습니다. 기기 인증이 살아 있는지는 <strong>요청 1,000번 중 1번만</strong> 확률적으로 DB 를 조회해 확인하고 있었습니다. DB 부하를 줄이려던 설계였습니다.</p>
+
+<p>로그를 보니 반복 요청 중 샘플링이 걸린 기록이 거의 없었습니다. 탐지 코드는 있었지만 <strong>사실상 발화하지 않았습니다.</strong></p>
+
+<h3 id="클라이언트는-왜-못-막았나">클라이언트는 왜 못 막았나</h3>
+
+<p>클라이언트에도 자기 검증 코드가 있었지만, 실시간 소켓의 connect 콜백에서만 실행됐습니다. 재현 상황에서는 소켓 요청이 응답 없이 걸려 있어 이 코드가 한 번도 돌지 않았습니다. 결국 <strong>서버가 결정적으로 막아야 한다</strong>는 결론이었습니다.</p>
+
+<h2 id="두-번-헛짚다">두 번 헛짚다</h2>
+
+<p><strong>1차 시도 — 세션 무효화 코드 추가.</strong> 샘플링에 걸렸을 때 세션을 확실히 끊도록 고쳤습니다. 효과가 없었습니다. 끊는 코드는 맞았지만, 그 코드가 실행되는 조건(1/1000 확률)이 너무 드물었습니다.</p>
+
+<p><strong>2차 시도 — 자동 로그인 경로 의심.</strong> 브라우저 자동 로그인이 기기 인증을 검사하지 않고 세션을 되살린다고 보고 가드를 바꿨습니다. 그런데 재현 중 서버 로그를 2분간 확인하니 <strong>그 경로 호출이 0건</strong>이었습니다. 영향 범위만 넓히는 변경이라 되돌렸습니다.</p>
+
+<p>두 번 모두 “코드만 보고 세운 가설”이었습니다. 세 번째부터는 가설마다 로그로 먼저 확인했습니다.</p>
+
+<h2 id="수정-방향-고르기">수정 방향 고르기</h2>
+
+<ul>
+  <li><strong>A. 세션에 30초 TTL 캐시를 두고, 캐시가 없으면 항상 DB 로 검증한다.</strong> 결정적이고, 유령 세션이 살아 있는 시간의 상한이 30초로 정해집니다. 정상 사용자의 DB 조회는 30초에 1번으로 제한됩니다.</li>
+  <li><strong>B. 기기 → 세션 역매핑 저장소를 만들어 차단 즉시(0초) 세션을 끊는다.</strong> 저장소 신설과 동기화 비용이 큽니다. 보안 요구가 0초가 되면 이쪽으로 올리기로 기록했습니다.</li>
+  <li><strong>C. 클라이언트에서 미리 확인한다.</strong> 서버 방어선이 아니라 UX 개선입니다.</li>
+</ul>
+
+<p>A 를 골랐습니다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">boolean</span> <span class="nf">verifyDeviceCached</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="nc">String</span> <span class="n">user</span><span class="o">,</span> <span class="nc">String</span> <span class="n">device</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">HttpSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="na">getSession</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">session</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// "user|device" 지문이 다르거나 30초가 지났으면 null</span>
+        <span class="nc">Boolean</span> <span class="n">cached</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">device</span><span class="o">,</span> <span class="no">TTL_30S</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">cached</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="n">cached</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="kt">boolean</span> <span class="n">ok</span> <span class="o">=</span> <span class="n">verifyDeviceFromDb</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">device</span><span class="o">);</span>   <span class="c1">// 샘플링 없이 항상 조회</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">session</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span> <span class="n">cache</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">device</span><span class="o">,</span> <span class="n">ok</span><span class="o">);</span> <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">ignore</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">ok</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>캐시에 결과만 넣지 않고 <strong><code class="language-plaintext highlighter-rouge">사용자|기기</code> 지문</strong>을 함께 넣었습니다. 세션이 다른 사용자로 재사용될 때 캐시가 오염되는 것을 막습니다.</li>
+  <li>세션이 없어 새로 만드는 경로는 캐시 없이 항상 DB 를 봅니다.</li>
+  <li>세션에서 사용자를 제거할 때 캐시 값도 함께 지웁니다.</li>
+</ul>
+
+<h2 id="비용-검증-부하-테스트">비용 검증: 부하 테스트</h2>
+
+<p>“모든 요청에서 검증한다”는 말이 DB 를 두드리는 것처럼 들려서, 개발 환경에서 부하 테스트로 확인했습니다.</p>
+
+<ul>
+  <li>19분 동안 92,399건 처리, 실패 0</li>
+  <li>DB 의 기기 인증 조회 흔적: <strong>164회</strong> → 캐시 hit 율 <strong>99.82%</strong></li>
+  <li>지연 p50 9.6ms, p95 17.9ms, 최대 150 RPS</li>
+  <li>운영 규모로 환산한 추가 DB 조회는 초당 약 2.3건. 기존 1/1000 샘플링(초당 약 2.2건)과 <strong>사실상 같은 수준</strong>이었습니다.</li>
+</ul>
+
+<p>사전에 “활성 사용자 수 ÷ TTL” 로 계산한 상한은 동접 1만 기준 초당 +333건이었습니다. 실측은 그보다 훨씬 낮았습니다. 같은 사용자의 요청이 30초 안에 몰리기 때문입니다.</p>
+
+<p>부하 테스트에서 배운 실무 팁도 있습니다.</p>
+
+<ul>
+  <li>대시보드 같은 무거운 API 는 30 RPS 에서 p95 가 40초까지 치솟아 측정을 방해했습니다. <strong>중간 무게의 단순 조회 API</strong> 를 고르는 것이 중요했습니다.</li>
+  <li>부하 도구의 쿠키 저장소가 세션을 하나로 합쳐 버려서, 로그인 호출마다 초기화해야 했습니다.</li>
+  <li>개발 환경에서 디버그 로그가 꺼져 있어, SQL 흔적 개수로 조회 횟수를 간접 측정했습니다.</li>
+</ul>
+
+<h2 id="결과와-남은-것">결과와 남은 것</h2>
+
+<ul>
+  <li>유령 세션 지속 시간: 사실상 무제한(샘플링이 걸릴 때까지) → <strong>최대 30초</strong></li>
+  <li>남은 것: 관리자가 기기를 다시 승인해도 최대 30초 동안은 차단 캐시가 남습니다. 0초가 필요해지면 B 안으로 올립니다.</li>
+</ul>
+
+<h2 id="배운-점">배운 점</h2>
+
+<ul>
+  <li><strong>“탐지 코드가 있다”와 “탐지가 발화한다”는 다릅니다.</strong> 확률 샘플링은 보안 경로에 맞지 않습니다.</li>
+  <li><strong>가설은 로그로 기각합니다.</strong> 코드만 보고 고친 두 번이 모두 헛짚었고, 로그 0건 하나가 2차 가설을 정리해 줬습니다.</li>
+  <li><strong>캐시 TTL 의 DB 부하는 “활성 사용자 ÷ TTL” 이 상한</strong>입니다. 실제로는 훨씬 낮으니 실측으로 확인합니다.</li>
+  <li>운영에 부하를 보내는 대신, 개발 환경 실측에 인스턴스 규모 비율을 곱해 외삽했습니다.</li>
+</ul>
+
+  </div>
+  <nav class="pager" aria-label="이전·다음 글"><a class="prev" href="/blog/2026/ime-slash-command-double-run/"><small>이전 글</small>한글로 쳤더니 페이지가 2개 — IME 조합 이벤트와 이중 실행 경로</a><a class="next" href="/blog/2026/keydown-forced-reflow/"><small>다음 글</small>키 하나에 19ms — 입력 지연을 만든 범인은 애니메이션이 아니라 :visible 이었다</a>
+  </nav>
+</article>
+
+  </main>
+  <footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 서현원</span>
+    <span class="footer-links">
+      <a href="https://github.com/viroovr" rel="noopener">GitHub</a>
+      <a href="mailto:tjgusdnjs789@gmail.com">Email</a>
+      <a href="/feed.xml">RSS</a>
+    </span>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<!-- Begin Jekyll SEO tag v2.9.1 -->
+<title>형제 노드보다 CPU 가 3배 — JSON 직렬화기의 제곱 비용 찾기 | 서현원</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="형제 노드보다 CPU 가 3배 — JSON 직렬화기의 제곱 비용 찾기" />
+<meta name="author" content="서현원" />
+<meta property="og:locale" content="ko" />
+<meta name="description" content="같은 역할의 서버 두 대를 비교해 원인을 좁히고, 이미 만들어져 있던 수정을 운영까지 끌고 간 기록" />
+<meta name="twitter:description" property="og:description" content="같은 역할의 서버 두 대를 비교해 원인을 좁히고, 이미 만들어져 있던 수정을 운영까지 끌고 간 기록" />
+<link rel="canonical" href="https://viroovr.github.io/blog/2026/json-serializer-quadratic-cpu/" />
+<meta property="og:url" content="https://viroovr.github.io/blog/2026/json-serializer-quadratic-cpu/" />
+<meta property="og:site_name" content="서현원" />
+<meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-10-22T21:00:00+09:00" />
+<meta property="article:modified_time" content="2026-10-22T21:00:00+09:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta name="twitter:title" content="형제 노드보다 CPU 가 3배 — JSON 직렬화기의 제곱 비용 찾기" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"서현원"},"dateModified":"2026-10-22T21:00:00+09:00","datePublished":"2026-10-22T21:00:00+09:00","description":"같은 역할의 서버 두 대를 비교해 원인을 좁히고, 이미 만들어져 있던 수정을 운영까지 끌고 간 기록","headline":"형제 노드보다 CPU 가 3배 — JSON 직렬화기의 제곱 비용 찾기","image":"https://viroovr.github.io/assets/img/my_pic.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://viroovr.github.io/blog/2026/json-serializer-quadratic-cpu/"},"url":"https://viroovr.github.io/blog/2026/json-serializer-quadratic-cpu/"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link type="application/atom+xml" rel="alternate" href="https://viroovr.github.io/feed.xml" title="서현원" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234f46e5%22/><text x=%2250%22 y=%2268%22 font-size=%2256%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22700%22>현</text></svg>">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script>
+  // 테마: 저장값 > OS 설정. 깜빡임 없게 head 에서 먼저 적용
+  (function () {
+    var t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+  })();
+</script>
+
+</head>
+<body class="post">
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">서현원</a>
+    <nav class="nav" aria-label="주요 메뉴"><a href="/blog/" aria-current="page">블로그</a>
+      <a href="/projects/" >프로젝트</a>
+      <button class="theme-toggle" type="button" aria-label="다크 모드 전환" title="다크 모드 전환">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+  <main id="main" class="wrap">
+    <article class="article">
+  <header class="article-head">
+    <a class="back" href="/blog/">← 블로그</a>
+    <h1>형제 노드보다 CPU 가 3배 — JSON 직렬화기의 제곱 비용 찾기</h1><p class="lead">같은 역할의 서버 두 대를 비교해 원인을 좁히고, 이미 만들어져 있던 수정을 운영까지 끌고 간 기록</p>
+    <p class="meta">
+      <time datetime="2026-10-22T21:00:00+09:00">2026년 10월 22일</time>
+      · 4분 읽기 · <a class="tag" href="/blog/?tag=troubleshooting">#troubleshooting</a> · <a class="tag" href="/blog/?tag=performance">#performance</a> · <a class="tag" href="/blog/?tag=jvm">#jvm</a>
+    </p>
+  </header>
+  <div class="prose">
+    <h2 id="증상">증상</h2>
+
+<p>같은 역할을 하는 WAS 노드 두 대 중 한 대(노드 A)만 java 프로세스 CPU 가 <strong>약 300%</strong> 였습니다. 옆 노드 B 는 108% 였고, 요청량 차이는 13% 뿐이었습니다. 응답 지연이나 요청 적체는 없었습니다. 대신 메모리 할당이 초당 약 3GB 였고, Young GC 가 약 3초마다 돌고 있었습니다.</p>
+
+<p>예전에 다른 노드에서도 같은 증상이 있었지만, 원인을 못 찾은 채 저절로 사라진 적이 있었습니다.</p>
+
+<h2 id="가설-지우기">가설 지우기</h2>
+
+<p>두 노드를 같은 시간대에 나란히 놓고 하나씩 지웠습니다.</p>
+
+<ul>
+  <li><strong>GC 스레드?</strong> GC 스레드가 쓰는 CPU 는 4~5% 뿐이었습니다.</li>
+  <li><strong>스레드 수?</strong> 두 노드가 비슷했습니다.</li>
+  <li><strong>JIT 컴파일?</strong> 해당 없었습니다.</li>
+  <li>스레드별 CPU 를 보니 <strong>요청 처리 스레드가 CPU 의 93%</strong> 를 쓰고 있었습니다. 요청을 처리하는 코드 자체가 무거웠던 것입니다.</li>
+</ul>
+
+<h2 id="프로파일링">프로파일링</h2>
+
+<p>async-profiler 로 30초 동안 CPU 샘플을 떴습니다. 가장 두드러진 경로는 JSON 직렬화였습니다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>toJSONString()
+  └ StringBuilder.toString()   ← 배열 복사, 전체 샘플의 약 14%
+</code></pre></div></div>
+
+<p>직렬화기가 배열에 항목을 하나 쓸 때마다 <strong>지금까지 쌓인 버퍼 전체를 문자열로 복사</strong>하고 있었습니다. 항목이 n 개면 복사량이 1 + 2 + … + n, 즉 <strong>응답 크기의 제곱</strong>에 비례합니다. 응답이 작을 때는 티가 안 나다가, 큰 응답에서 급격히 무거워지는 구조입니다.</p>
+
+<h2 id="왜-노드-a-만">왜 노드 A 만?</h2>
+
+<p>직렬화 코드는 모든 노드에 똑같이 들어 있습니다. 그런데 왜 A 만 심했을까요?</p>
+
+<p>액세스 로그에서 <strong>URL 별 응답 바이트 합계</strong>를 냈습니다. 요청 수가 아니라 바이트로 본 것이 핵심이었습니다.</p>
+
+<ul>
+  <li>채팅 메시지 조회 API 응답량: 노드 A 108MB, 노드 B 58MB</li>
+  <li>노드 A 의 이 트래픽 중 약 80% 가 <strong>PC 클라이언트 한 곳</strong>에서 왔습니다. 약 100KB 짜리 채팅 기록을 하루 4만 번 반복해서 가져가고 있었습니다.</li>
+  <li>로드밸런서가 세션 고정(sticky session)이라, 이 클라이언트의 요청이 계속 노드 A 로만 갔습니다.</li>
+</ul>
+
+<p>즉 비용 자체는 모든 노드에 깔려 있었고, 노드 A 는 큰 응답을 반복 요청하는 클라이언트 때문에 <strong>유독 두드러졌을 뿐</strong>이었습니다.</p>
+
+<h2 id="수정은-이미-있었다">수정은 이미 있었다</h2>
+
+<p>코드를 고치려고 보니, 동료가 같은 낭비 복사를 없앤 수정을 <strong>2주 전에 개발 브랜치에 머지해 둔 상태</strong>였습니다. 다만 운영 브랜치에는 아직 들어가지 않았습니다.</p>
+
+<p>그래서 이번 작업은 “고치기”가 아니라 <strong>“이미 있는 수정을 원인과 연결해 운영까지 보내기”</strong> 였습니다.</p>
+
+<ol>
+  <li>수정 커밋이 운영 브랜치의 조상에 없는지 확인했습니다.</li>
+  <li>핫픽스 트랙으로 cherry-pick 했습니다.</li>
+  <li><strong>배포 전에 기준선을 저장했습니다.</strong> APM 보관 기간이 약 7일이라, 늦으면 비교할 수치가 사라지기 때문입니다.</li>
+  <li>배포 후 실제로 서빙 중인 <code class="language-plaintext highlighter-rouge">.class</code> 파일의 md5 와 JVM 시작 시각을 확인했습니다. “배포했다”는 말이 아니라 실제 바이너리를 확인한 것입니다.</li>
+</ol>
+
+<h2 id="함정-재시작-직후-수치">함정: 재시작 직후 수치</h2>
+
+<p>배포 직후 수치를 보니 오히려 20~30% <strong>나빠진 것처럼</strong> 보였습니다. JVM 재시작 직후에는 JIT 컴파일이 덜 된 상태라 같은 코드도 느리게 돕니다. 그래서 판정을 보류하고, <strong>다음 날 같은 시간대 3개 구간</strong>을 다시 재서 비교했습니다.</p>
+
+<h2 id="결과">결과</h2>
+
+<ul>
+  <li>프로파일러에서 문제 경로 샘플: 424 → <strong>0</strong></li>
+  <li>전체 CPU 중 직렬화 비중: 15% → <strong>1%</strong></li>
+  <li>요청당 메모리 할당: <strong>73~96% 감소</strong></li>
+  <li>채팅 API 의 요청당 할당: 약 115~215MB → <strong>약 7MB</strong></li>
+  <li>운영 WAS 15대 전체: <strong>요청당 CPU 16~26% 감소, 요청당 GC 시간 41~57% 감소</strong> (평소 일간 변동은 ±4%)</li>
+</ul>
+
+<p>한 노드의 이상 증상을 쫓다가, 결국 전체 노드의 비용을 줄인 셈입니다.</p>
+
+<h2 id="배운-점">배운 점</h2>
+
+<ul>
+  <li><strong>형제 노드 비교는 강력한 도구입니다.</strong> 같은 코드, 같은 역할인데 한쪽만 다르면, 차이는 입력(트래픽)에 있습니다.</li>
+  <li><strong>요청 수가 아니라 응답 바이트로 봐야 할 때가 있습니다.</strong> 요청 수는 13% 차이였지만, 응답량은 거의 2배였습니다.</li>
+  <li><strong>기준선은 서버별 원본 값으로, 배포 전에 저장합니다.</strong> 집계값만 남기면 나중에 다른 기준으로 다시 볼 수 없습니다. 운영이 아닌 서버는 집계에서 뺍니다.</li>
+  <li><strong>재시작 직후 수치로 판정하지 않습니다.</strong> JIT 워밍업이 끝난 뒤, 같은 요일·같은 시간대끼리 비교합니다.</li>
+  <li><strong>성능 수정은 머지가 아니라 운영 반영까지 추적합니다.</strong> 수정이 2주 동안 운영에 안 들어가 있었다는 것이 이번 일의 진짜 원인이었습니다.</li>
+</ul>
+
+<h2 id="다음에-같은-증상이-오면">다음에 같은 증상이 오면</h2>
+
+<ol>
+  <li>이상한 노드와 정상 노드를 같은 시간대에 나란히 놓는다.</li>
+  <li>GC 스레드 / 요청 스레드 / 기타로 CPU 를 나눈다.</li>
+  <li>요청 스레드라면 프로파일러로 30초 샘플을 뜬다.</li>
+  <li>액세스 로그를 URL 별 <strong>바이트</strong>로 집계해 두 노드를 비교한다.</li>
+  <li>수정이 이미 있는지, 있다면 운영 브랜치에 들어갔는지부터 확인한다.</li>
+</ol>
+
+  </div>
+  <nav class="pager" aria-label="이전·다음 글"><a class="prev" href="/blog/2026/or-filter-lateral-timeout/"><small>이전 글</small>필터 하나 더했더니 35초 타임아웃 — OR 조건과 LATERAL 쿼리 플랜 추적기</a><a class="next" href="/blog/2026/jvm-context-leak-full-gc/"><small>다음 글</small>CPU 100% 의 정체는 Full GC — 닫히지 않은 요청 컨텍스트 368만 개 추적기</a>
+  </nav>
+</article>
+
+  </main>
+  <footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 서현원</span>
+    <span class="footer-links">
+      <a href="https://github.com/viroovr" rel="noopener">GitHub</a>
+      <a href="mailto:tjgusdnjs789@gmail.com">Email</a>
+      <a href="/feed.xml">RSS</a>
+    </span>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js" defer></script>
+</body>
+</html>

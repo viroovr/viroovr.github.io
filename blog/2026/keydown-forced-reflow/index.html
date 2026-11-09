@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<!-- Begin Jekyll SEO tag v2.9.1 -->
+<title>키 하나에 19ms — 입력 지연을 만든 범인은 애니메이션이 아니라 :visible 이었다 | 서현원</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="키 하나에 19ms — 입력 지연을 만든 범인은 애니메이션이 아니라 :visible 이었다" />
+<meta name="author" content="서현원" />
+<meta property="og:locale" content="ko" />
+<meta name="description" content="Performance 트레이스를 이벤트 구간 단위로 쪼개 보고, jQuery :visible 이 만든 강제 리플로우를 찾아낸 과정" />
+<meta name="twitter:description" property="og:description" content="Performance 트레이스를 이벤트 구간 단위로 쪼개 보고, jQuery :visible 이 만든 강제 리플로우를 찾아낸 과정" />
+<link rel="canonical" href="https://viroovr.github.io/blog/2026/keydown-forced-reflow/" />
+<meta property="og:url" content="https://viroovr.github.io/blog/2026/keydown-forced-reflow/" />
+<meta property="og:site_name" content="서현원" />
+<meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-05-20T21:00:00+09:00" />
+<meta property="article:modified_time" content="2026-05-20T21:00:00+09:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta name="twitter:title" content="키 하나에 19ms — 입력 지연을 만든 범인은 애니메이션이 아니라 :visible 이었다" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"서현원"},"dateModified":"2026-05-20T21:00:00+09:00","datePublished":"2026-05-20T21:00:00+09:00","description":"Performance 트레이스를 이벤트 구간 단위로 쪼개 보고, jQuery :visible 이 만든 강제 리플로우를 찾아낸 과정","headline":"키 하나에 19ms — 입력 지연을 만든 범인은 애니메이션이 아니라 :visible 이었다","image":"https://viroovr.github.io/assets/img/my_pic.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://viroovr.github.io/blog/2026/keydown-forced-reflow/"},"url":"https://viroovr.github.io/blog/2026/keydown-forced-reflow/"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link type="application/atom+xml" rel="alternate" href="https://viroovr.github.io/feed.xml" title="서현원" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234f46e5%22/><text x=%2250%22 y=%2268%22 font-size=%2256%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22700%22>현</text></svg>">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script>
+  // 테마: 저장값 > OS 설정. 깜빡임 없게 head 에서 먼저 적용
+  (function () {
+    var t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+  })();
+</script>
+
+</head>
+<body class="post">
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">서현원</a>
+    <nav class="nav" aria-label="주요 메뉴"><a href="/blog/" aria-current="page">블로그</a>
+      <a href="/projects/" >프로젝트</a>
+      <button class="theme-toggle" type="button" aria-label="다크 모드 전환" title="다크 모드 전환">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+  <main id="main" class="wrap">
+    <article class="article">
+  <header class="article-head">
+    <a class="back" href="/blog/">← 블로그</a>
+    <h1>키 하나에 19ms — 입력 지연을 만든 범인은 애니메이션이 아니라 :visible 이었다</h1><p class="lead">Performance 트레이스를 이벤트 구간 단위로 쪼개 보고, jQuery :visible 이 만든 강제 리플로우를 찾아낸 과정</p>
+    <p class="meta">
+      <time datetime="2026-05-20T21:00:00+09:00">2026년 5월 20일</time>
+      · 4분 읽기 · <a class="tag" href="/blog/?tag=troubleshooting">#troubleshooting</a> · <a class="tag" href="/blog/?tag=performance">#performance</a> · <a class="tag" href="/blog/?tag=frontend">#frontend</a>
+    </p>
+  </header>
+  <div class="prose">
+    <h2 id="증상">증상</h2>
+
+<p>macOS 의 데스크톱 앱(Electron 22, Chromium 108)과 Safari 에서 게시물 제목, 하위업무, 할일을 입력하면 <strong>글자가 늦게 따라온다</strong>는 보고가 들어왔습니다. Windows 에서는 같은 보고가 거의 없었습니다.</p>
+
+<h2 id="관측-사실">관측 사실</h2>
+
+<p>보고자 환경에서 DevTools Performance 트레이스(약 30초)를 받아 keydown 이벤트만 골라 봤습니다.</p>
+
+<ul>
+  <li><strong>영문</strong> 입력의 keydown 처리 시간은 일관되게 <strong>약 19ms</strong>(18.9~20.0ms)였습니다.</li>
+  <li><strong>한글</strong> 입력은 1ms 미만이었습니다. IME 조합 중에는 <code class="language-plaintext highlighter-rouge">isComposing</code> 가드가 핸들러를 일찍 끝내기 때문입니다. 영문은 핸들러 전체를 탔습니다.</li>
+  <li>19.96ms 짜리 keydown 하나를 쪼개 보면:
+    <ul>
+      <li>jQuery 이벤트 핸들러 자체: 1.18ms</li>
+      <li>그 직후 <strong>UpdateLayoutTree: 17.78ms</strong>. 이 구간 샘플 137개가 전부 네이티브 스타일/레이아웃 계산이었습니다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>60fps 한 프레임이 16.7ms 이니, 키를 누를 때마다 레이아웃 계산이 한 프레임을 통째로 먹고 있었습니다.</p>
+
+<h2 id="첫-번째-가설-배경-애니메이션-반만-맞았다">첫 번째 가설: 배경 애니메이션 (반만 맞았다)</h2>
+
+<p>같은 트레이스 전체의 CPU 샘플을 보면 <strong>lottie 애니메이션의 <code class="language-plaintext highlighter-rouge">advanceTime</code> 이 48.5%</strong> 로 압도적이었습니다. 화면 뒤쪽에서 lottie 13개가 계속 돌고 있었습니다.</p>
+
+<p>그래서 1차로 “작성 팝업이 열리면 배경 lottie 를 멈춘다”를 넣었습니다. 여기서 두 번 틀렸습니다.</p>
+
+<ol>
+  <li>처음엔 <code class="language-plaintext highlighter-rouge">pause()</code> 만 호출했는데 효과가 없었습니다(35.29 → 38.16ms). 멈춘 SVG 도 <strong>레이아웃 트리에는 그대로 남아</strong> 있기 때문입니다. <code class="language-plaintext highlighter-rouge">display: none</code> 으로 레이아웃에서 빼야 했습니다.</li>
+  <li>처음 훅을 건 초기화 함수는 <strong>외부에서 아무도 호출하지 않는 함수</strong>였습니다. 수정이 아예 실행되지 않았습니다. 실제로 호출되는 함수로 옮겼습니다.</li>
+</ol>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 작성 팝업이 열릴 때 배경 lottie 를 레이아웃에서 제외</span>
+<span class="kd">function</span> <span class="nf">pauseAll</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nf">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">dotlottie-player</span><span class="dl">'</span><span class="p">).</span><span class="nf">forEach</span><span class="p">((</span><span class="nx">el</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">paused</span><span class="p">.</span><span class="nf">has</span><span class="p">(</span><span class="nx">el</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span>
+    <span class="nx">el</span><span class="p">.</span><span class="nf">pause</span><span class="p">();</span>
+    <span class="nx">paused</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">el</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span><span class="p">);</span>   <span class="c1">// 원래 display 보존</span>
+    <span class="nx">el</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">none</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+<span class="c1">// 팝업이 닫힐 때 resumeAll() 로 복원</span>
+</code></pre></div></div>
+
+<p>lottie 13개를 강제로 띄운 시뮬레이션에서는 42.59ms → 9.43ms(−78%)로 크게 줄었습니다. 그런데 <strong>p95 는 그대로</strong>였습니다.</p>
+
+<p>결정적인 단서는 제 PC 의 트레이스였습니다. lottie 가 0개인 환경에서도 keydown 최대 15.2ms 중 13.98ms 가 UpdateLayoutTree 였습니다. <strong>lottie 와 별개인 레이아웃 비용이 따로 있었던 것</strong>입니다. “전체 CPU 의 top 함수”와 “keydown 구간 안의 비용”은 다른 이야기였습니다.</p>
+
+<h2 id="진짜-원인-매-키마다-visible-두-번">진짜 원인: 매 키마다 :visible 두 번</h2>
+
+<p>keydown 구간의 hot frame 에 <code class="language-plaintext highlighter-rouge">jQuery.expr.pseudos.visible</code> 이 반복해서 보였습니다. 코드를 찾아보니 키를 누를 때마다 실행되는 핸들러가 이런 확인을 하고 있었습니다.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if </span><span class="p">(</span><span class="nx">$popup</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">#hashTagPopup</span><span class="dl">'</span><span class="p">).</span><span class="nf">is</span><span class="p">(</span><span class="dl">'</span><span class="s1">:visible</span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+<span class="k">if </span><span class="p">(</span><span class="nx">$popup</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">#mentionPopup</span><span class="dl">'</span><span class="p">).</span><span class="nf">is</span><span class="p">(</span><span class="dl">'</span><span class="s1">:visible</span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p>jQuery 의 <code class="language-plaintext highlighter-rouge">:visible</code> 은 내부적으로 <code class="language-plaintext highlighter-rouge">offsetWidth</code>, <code class="language-plaintext highlighter-rouge">offsetHeight</code>, <code class="language-plaintext highlighter-rouge">getClientRects()</code> 를 읽습니다. 모두 <strong>레이아웃 값을 읽는 API</strong> 입니다.</p>
+
+<p>문제는 순서입니다. 같은 keydown 처리 안에서 앞쪽 코드가 이미 DOM 을 바꿔 놓았습니다(입력 내용 변경, 스타일 처리). 그 직후에 레이아웃 값을 읽으면, 브라우저는 정확한 값을 주려고 <strong>스타일과 레이아웃을 그 자리에서 동기로 다시 계산</strong>합니다. 이것이 강제 리플로우(forced reflow), 즉 “쓰고 나서 바로 읽기” 패턴입니다. DOM 노드가 약 1.4만 개인 화면이라 한 번 계산이 비쌌습니다.</p>
+
+<h2 id="수정-방향-고르기">수정 방향 고르기</h2>
+
+<ul>
+  <li><strong>A. 표시 상태를 플래그로 관리한다.</strong> 효과는 가장 크지만, 팝업을 여닫는 진입점을 하나라도 놓치면 회귀가 납니다.</li>
+  <li><strong>B. <code class="language-plaintext highlighter-rouge">style.display</code> 를 직접 읽는다.</strong> 인라인 스타일만 보므로 레이아웃 계산이 필요 없습니다. 바뀌는 줄은 2줄입니다.</li>
+  <li><strong>C. CSS <code class="language-plaintext highlighter-rouge">contain</code> 으로 레이아웃 범위를 가둔다.</strong> 효과가 불확실하고 절대 위치 자식이 깨질 수 있습니다.</li>
+  <li><strong>D. 결과를 캐시한다.</strong> 첫 읽기의 리플로우는 남습니다.</li>
+</ul>
+
+<p>B 를 먼저 적용하기로 했습니다. 그 전에 두 팝업의 표시/숨김이 <strong>모두 인라인 <code class="language-plaintext highlighter-rouge">display: block/none</code> 으로만</strong> 바뀐다는 것을 grep 으로 확인했습니다. CSS 클래스로 숨기는 경로가 있으면 B 는 틀린 답을 냅니다.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// before: $popup.find('#hashTagPopup').is(':visible')</span>
+<span class="kd">const</span> <span class="nx">el</span> <span class="o">=</span> <span class="nx">$popup</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">#hashTagPopup</span><span class="dl">'</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+<span class="k">if </span><span class="p">(</span><span class="nx">el</span> <span class="o">&amp;&amp;</span> <span class="nx">el</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">none</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>   <span class="c1">// 멘션 팝업도 동일</span>
+</code></pre></div></div>
+
+<h2 id="검증">검증</h2>
+
+<ul>
+  <li>수정 후 트레이스에서 <code class="language-plaintext highlighter-rouge">:visible</code> hot frame 이 사라졌습니다.</li>
+  <li>해시태그·멘션 팝업의 방향키/Enter 동작과 일반 입력을 수동으로 확인했습니다.</li>
+  <li>다만 제 환경에서는 원래 지연이 작아서, 수치 차이가 측정 변동에 묻혔습니다. keydown 이후 다음 프레임까지 걸린 시간은 vsync 를 맞추면 약 2ms, 놓치면 약 14ms 로 갈렸습니다. 이런 이봉 분포라 1~2ms 개선은 구분이 안 됐습니다.</li>
+  <li><strong>보고자 환경에서 수정 후 트레이스를 다시 받지 못해</strong>, 이 건은 “부분 해결”로 닫았습니다. 같은 <code class="language-plaintext highlighter-rouge">:visible</code> 패턴이 약 12곳 더 남아 후속 작업으로 넘겼습니다.</li>
+</ul>
+
+<h2 id="배운-점">배운 점</h2>
+
+<ul>
+  <li><strong>CPU 프로파일의 1등 함수가 곧 지연의 원인은 아닙니다.</strong> 전체 평균이 아니라 문제 이벤트 구간만 잘라서 봐야 합니다. 이 가정 때문에 틀린 결론을 여러 번 냈습니다.</li>
+  <li><strong>레이아웃을 읽는 API 목록을 외워 둡니다.</strong> <code class="language-plaintext highlighter-rouge">offsetWidth/Height</code>, <code class="language-plaintext highlighter-rouge">getBoundingClientRect</code>, <code class="language-plaintext highlighter-rouge">getClientRects</code>, <code class="language-plaintext highlighter-rouge">getComputedStyle</code>, 그리고 이것들을 감싼 jQuery 의 <code class="language-plaintext highlighter-rouge">:visible</code>, <code class="language-plaintext highlighter-rouge">.offset()</code>, <code class="language-plaintext highlighter-rouge">.height()</code>.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">pause()</code> 는 레이아웃 비용을 없애지 않습니다.</strong> 레이아웃에서 빼려면 <code class="language-plaintext highlighter-rouge">display: none</code> 입니다.</li>
+  <li><strong>수정을 걸 함수의 호출자를 먼저 확인합니다.</strong> 아무도 부르지 않는 함수에 건 수정은 실행되지 않습니다.</li>
+  <li><strong>측정 단위를 항상 밝힙니다.</strong> “이벤트 처리 시간”과 “다음 프레임까지 시간”은 다른 숫자입니다. 뒤쪽에는 vsync 대기가 섞입니다.</li>
+  <li>측정 코드도 조심합니다. 측정 리스너 안에서 <code class="language-plaintext highlighter-rouge">offsetHeight</code> 를 읽었더니 <strong>측정 코드가 13ms 지연을 만들고</strong> 있었습니다.</li>
+  <li>환경에 따라 다른 결함이면, 가설을 쌓기 전에 보고자 환경에서 트레이스부터 받습니다.</li>
+</ul>
+
+  </div>
+  <nav class="pager" aria-label="이전·다음 글"><a class="prev" href="/blog/2026/ghost-session-sampling-check/"><small>이전 글</small>쫓아낸 기기가 계속 로그인돼 있다 — 1/1000 샘플링 검증이 만든 유령 세션</a><a class="next" href="/blog/2026/socket-ephemeral-port-exhaustion/"><small>다음 글</small>CPU 99% 인데 범인은 CPU 가 아니었다 — 소켓 서버의 임시 포트 고갈</a>
+  </nav>
+</article>
+
+  </main>
+  <footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 서현원</span>
+    <span class="footer-links">
+      <a href="https://github.com/viroovr" rel="noopener">GitHub</a>
+      <a href="mailto:tjgusdnjs789@gmail.com">Email</a>
+      <a href="/feed.xml">RSS</a>
+    </span>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js" defer></script>
+</body>
+</html>

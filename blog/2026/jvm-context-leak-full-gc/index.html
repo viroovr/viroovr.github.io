@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<!-- Begin Jekyll SEO tag v2.9.1 -->
+<title>CPU 100% 의 정체는 Full GC — 닫히지 않은 요청 컨텍스트 368만 개 추적기 | 서현원</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="CPU 100% 의 정체는 Full GC — 닫히지 않은 요청 컨텍스트 368만 개 추적기" />
+<meta name="author" content="서현원" />
+<meta property="og:locale" content="ko" />
+<meta name="description" content="sar → jstat → jmap → javap 순서로 좁혀 들어가 한 줄로 고친 메모리 누수, 그리고 누수 속도로 재발 시점을 예측한 이야기" />
+<meta name="twitter:description" property="og:description" content="sar → jstat → jmap → javap 순서로 좁혀 들어가 한 줄로 고친 메모리 누수, 그리고 누수 속도로 재발 시점을 예측한 이야기" />
+<link rel="canonical" href="https://viroovr.github.io/blog/2026/jvm-context-leak-full-gc/" />
+<meta property="og:url" content="https://viroovr.github.io/blog/2026/jvm-context-leak-full-gc/" />
+<meta property="og:site_name" content="서현원" />
+<meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-10-23T21:00:00+09:00" />
+<meta property="article:modified_time" content="2026-10-23T21:00:00+09:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta name="twitter:title" content="CPU 100% 의 정체는 Full GC — 닫히지 않은 요청 컨텍스트 368만 개 추적기" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"서현원"},"dateModified":"2026-10-23T21:00:00+09:00","datePublished":"2026-10-23T21:00:00+09:00","description":"sar → jstat → jmap → javap 순서로 좁혀 들어가 한 줄로 고친 메모리 누수, 그리고 누수 속도로 재발 시점을 예측한 이야기","headline":"CPU 100% 의 정체는 Full GC — 닫히지 않은 요청 컨텍스트 368만 개 추적기","image":"https://viroovr.github.io/assets/img/my_pic.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://viroovr.github.io/blog/2026/jvm-context-leak-full-gc/"},"url":"https://viroovr.github.io/blog/2026/jvm-context-leak-full-gc/"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link type="application/atom+xml" rel="alternate" href="https://viroovr.github.io/feed.xml" title="서현원" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234f46e5%22/><text x=%2250%22 y=%2268%22 font-size=%2256%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22700%22>현</text></svg>">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script>
+  // 테마: 저장값 > OS 설정. 깜빡임 없게 head 에서 먼저 적용
+  (function () {
+    var t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+  })();
+</script>
+
+</head>
+<body class="post">
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">서현원</a>
+    <nav class="nav" aria-label="주요 메뉴"><a href="/blog/" aria-current="page">블로그</a>
+      <a href="/projects/" >프로젝트</a>
+      <button class="theme-toggle" type="button" aria-label="다크 모드 전환" title="다크 모드 전환">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+  <main id="main" class="wrap">
+    <article class="article">
+  <header class="article-head">
+    <a class="back" href="/blog/">← 블로그</a>
+    <h1>CPU 100% 의 정체는 Full GC — 닫히지 않은 요청 컨텍스트 368만 개 추적기</h1><p class="lead">sar → jstat → jmap → javap 순서로 좁혀 들어가 한 줄로 고친 메모리 누수, 그리고 누수 속도로 재발 시점을 예측한 이야기</p>
+    <p class="meta">
+      <time datetime="2026-10-23T21:00:00+09:00">2026년 10월 23일</time>
+      · 4분 읽기 · <a class="tag" href="/blog/?tag=troubleshooting">#troubleshooting</a> · <a class="tag" href="/blog/?tag=performance">#performance</a> · <a class="tag" href="/blog/?tag=jvm">#jvm</a>
+    </p>
+  </header>
+  <div class="prose">
+    <h2 id="증상">증상</h2>
+
+<p>외부 연동용 API 서버의 CPU 가 갑자기 100% 가 됐습니다. 응답이 느려졌고, 재시작해야만 회복됐습니다.</p>
+
+<h2 id="좁혀-들어가기">좁혀 들어가기</h2>
+
+<p>증상(CPU)에서 출발해 GC → 메모리 → 프레임워크 동작 → 우리 코드 한 줄 순서로 내려갔습니다.</p>
+
+<h3 id="1-cpu-를-쓰는-것은-gc-였다">1. CPU 를 쓰는 것은 GC 였다</h3>
+
+<p><code class="language-plaintext highlighter-rouge">sar -u</code> 로 언제부터 올랐는지 보고, <code class="language-plaintext highlighter-rouge">jstat -gcutil</code> 로 GC 상태를 봤습니다.</p>
+
+<ul>
+  <li>Old 영역 사용률 <strong>100%</strong> 고정</li>
+  <li>Full GC 누적 410회. 한 번에 약 5.7초씩 걸렸고, 9분 동안 19번 돌았습니다. <strong>시간의 약 24% 가 GC 정지</strong>였습니다.</li>
+  <li>Full GC 를 돌려도 회수되는 메모리가 거의 없었습니다. 살아 있는 객체가 힙을 채우고 있다는 뜻입니다.</li>
+</ul>
+
+<h3 id="2-무엇이-old-를-채웠나">2. 무엇이 Old 를 채웠나</h3>
+
+<p><code class="language-plaintext highlighter-rouge">jmap -histo</code> 상위 클래스를 봤습니다.</p>
+
+<ul>
+  <li><strong>요청 컨텍스트 객체 368만 개</strong></li>
+  <li>그리고 거기 딸린 자원 관리자, DB 연결 래퍼, 맵 객체들이 <strong>정확히 같은 개수</strong>로 묶여 있었습니다.</li>
+</ul>
+
+<p>개수가 1:1 로 묶인 클래스 묶음은 “한 객체가 나머지를 붙잡고 있다”는 강한 신호입니다.</p>
+
+<h3 id="3-요청-수와-맞아떨어지는가">3. 요청 수와 맞아떨어지는가</h3>
+
+<p>재시작한 JVM 에서 61초 동안 컨텍스트 객체가 <strong>655개</strong> 늘었습니다. 같은 시간 알림 API 호출은 <strong>641건</strong>이었습니다. 요청 하나당 하나씩 새고 있었습니다.</p>
+
+<h3 id="4-왜-안-사라지나">4. 왜 안 사라지나</h3>
+
+<p><code class="language-plaintext highlighter-rouge">javap -p</code> 로 프레임워크 클래스를 열어 봤습니다. 이 컨텍스트는 생성될 때 <strong>static 풀에 자기 자신을 등록</strong>하고, <code class="language-plaintext highlighter-rouge">close()</code> 가 불려야만 풀에서 빠집니다. 누군가 <code class="language-plaintext highlighter-rouge">close()</code> 를 빠뜨리면 영원히 남습니다.</p>
+
+<h3 id="5-누가-안-닫나">5. 누가 안 닫나</h3>
+
+<p>외부 API 진입점(게이트웨이)의 흐름을 따라갔습니다.</p>
+
+<ol>
+  <li>액션을 실행하기 전에 <strong>API 키 검사와 로그 기록</strong>을 위해 DB 를 씁니다. 이때 컨텍스트가 하나 만들어집니다.</li>
+  <li>그다음 액션 실행부가 새 컨텍스트를 만들면서 <strong>앞의 것을 닫지 않고 덮어씁니다.</strong></li>
+  <li>덮어써진 컨텍스트는 static 풀에만 남아 → 요청 1건당 1개 누수.</li>
+</ol>
+
+<p>결정적인 단서는 <strong>구조가 같은 형제 게이트웨이</strong>였습니다. 그쪽은 액션 전에 컨텍스트를 먼저 정리(free)하고 있었고, 누수가 없었습니다.</p>
+
+<h2 id="재현">재현</h2>
+
+<p>테스트 서버에서 게이트웨이로 요청을 보냈습니다.</p>
+
+<ul>
+  <li>요청 21,013건 → 누수 객체 <strong>21,004개</strong> (1:1)</li>
+  <li>수정 후 200건 호출 → 19개, 더 늘지 않음</li>
+</ul>
+
+<p>운영에 넣기 전에 “요청 N건 = 누수 N개”를 확인한 것이 확신의 근거가 됐습니다.</p>
+
+<h2 id="재발-시점-예측">재발 시점 예측</h2>
+
+<p>누수 속도(초당 6.5~10.7개)와 힙 크기로 계산하면 <strong>약 5~6일 뒤 힙이 다시 가득 찰</strong> 것이었습니다. 운영 추세를 보고 “10월 19일 저녁 전후 재발”을 예측했고, 실제로 19일 오후에 재발했습니다. 배포 브랜치가 운영 브랜치 전환과 맞물려 늦어지는 바람에, 예측한 재발을 한 번 겪고 나서야 수정이 나갔습니다.</p>
+
+<h2 id="수정">수정</h2>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gi">+        freeContext();   // 키 검사·로그용 DB 호출이 만든 컨텍스트를 액션 전에 닫는다
+</span>         result = performAction(apiKey, request, response);
+</code></pre></div></div>
+
+<ul>
+  <li>형제 게이트웨이와 같은 방식으로, <strong>한 줄</strong>을 추가했습니다.</li>
+  <li>바이트코드를 비교해 원본과의 차이가 이 호출 하나뿐인 것을 확인했습니다.</li>
+  <li>다른 대안(컨텍스트 생성 순서 변경, 프레임워크 jar 수정)은 영향 범위가 넓어서 제외했습니다.</li>
+  <li>롤백은 <code class="language-plaintext highlighter-rouge">.class</code> 파일 하나만 되돌리면 됩니다.</li>
+</ul>
+
+<h2 id="결과-배포-169시간-후">결과 (배포 16.9시간 후)</h2>
+
+<ul>
+  <li>컨텍스트 객체: 수정 전 속도라면 40~65만 개였을 시점에 <strong>18,709개</strong></li>
+  <li>누수 속도: 초당 6.5~10.7개 → <strong>초당 약 0.39개</strong> (남은 것은 별개의 작은 2차 경로)</li>
+  <li>Old 영역: 장애 직전 100% → <strong>37%</strong></li>
+</ul>
+
+<h2 id="아쉬웠던-점">아쉬웠던 점</h2>
+
+<ul>
+  <li><strong>처음에 프레임워크 코드를 잘못 읽었습니다.</strong> “보통은 새지 않는다”고 기록했다가 정정했습니다. 추측하지 말고 처음부터 <code class="language-plaintext highlighter-rouge">javap -c</code> 로 바이트코드를 직접 확인했어야 했습니다.</li>
+  <li><strong>GC 로그가 없었습니다.</strong> 장애가 시작된 순간의 상황은 직접 볼 수 없었습니다.</li>
+</ul>
+
+<h2 id="배운-점">배운 점</h2>
+
+<ul>
+  <li><strong>CPU 100% 가 항상 “코드가 바쁘다”는 뜻은 아닙니다.</strong> Old 영역이 고정돼 있다면 GC 가 CPU 를 먹고 있는 것입니다.</li>
+  <li><strong>히스토그램에서 개수가 같은 클래스 묶음을 찾으면</strong> 누수의 주인을 빨리 찾을 수 있습니다.</li>
+  <li><strong>같은 구조인데 문제가 없는 형제 코드</strong>가 가장 좋은 정답지입니다.</li>
+  <li><strong>누수 속도를 알면 재발 시점을 계산할 수 있습니다.</strong> 조기 경보 지표(Old 사용률, 의심 객체 수)를 주기적으로 수집하면 장애 전에 대응할 수 있습니다.</li>
+</ul>
+
+<h2 id="다음에-같은-증상이-오면-런북">다음에 같은 증상이 오면 (런북)</h2>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">sar -u</code> 로 언제부터인지, <code class="language-plaintext highlighter-rouge">jstat -gcutil</code> 로 GC 때문인지 함께 본다.</li>
+  <li>Old 가 고정되고 FGC 가 계속 늘면 → <code class="language-plaintext highlighter-rouge">jmap -histo:live</code> 상위 20개에서 같은 개수로 묶이는 클래스를 찾는다.</li>
+  <li>그 주인 클래스가 static 컬렉션에 등록되는지 <code class="language-plaintext highlighter-rouge">javap -p</code> 로 확인하고, 빠지는 조건(<code class="language-plaintext highlighter-rouge">close</code>)을 누가 빠뜨리는지 추적한다.</li>
+  <li>구조가 같은데 누수가 없는 형제 코드와 비교한다.</li>
+  <li>테스트 서버에서 “요청 N건 → 객체 N개”를 재현한 뒤 수정 전후를 비교한다.</li>
+  <li>운영 JVM 에는 GC 로그와 <code class="language-plaintext highlighter-rouge">-XX:+HeapDumpOnOutOfMemoryError</code> 를 미리 켜 둔다.</li>
+</ol>
+
+  </div>
+  <nav class="pager" aria-label="이전·다음 글"><a class="prev" href="/blog/2026/json-serializer-quadratic-cpu/"><small>이전 글</small>형제 노드보다 CPU 가 3배 — JSON 직렬화기의 제곱 비용 찾기</a><a class="next" href="/blog/2026/restart/"><small>다음 글</small>블로그를 다시 시작하며</a>
+  </nav>
+</article>
+
+  </main>
+  <footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 서현원</span>
+    <span class="footer-links">
+      <a href="https://github.com/viroovr" rel="noopener">GitHub</a>
+      <a href="mailto:tjgusdnjs789@gmail.com">Email</a>
+      <a href="/feed.xml">RSS</a>
+    </span>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js" defer></script>
+</body>
+</html>

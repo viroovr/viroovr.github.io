@@ -81,6 +81,34 @@
   <time datetime="2026-11-06T09:00:00+09:00">2026.11.06</time>
 </li>
 
+    <li class="post-item" data-tags="troubleshooting performance jvm">
+  <a href="/blog/2026/jvm-context-leak-full-gc/">
+    <span class="post-item-title">CPU 100% 의 정체는 Full GC — 닫히지 않은 요청 컨텍스트 368만 개 추적기</span><span class="post-item-desc">sar → jstat → jmap → javap 순서로 좁혀 들어가 한 줄로 고친 메모리 누수, 그리고 누수 속도로 재발 시점을 예측한 이야기</span>
+  </a>
+  <time datetime="2026-10-23T21:00:00+09:00">2026.10.23</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance jvm">
+  <a href="/blog/2026/json-serializer-quadratic-cpu/">
+    <span class="post-item-title">형제 노드보다 CPU 가 3배 — JSON 직렬화기의 제곱 비용 찾기</span><span class="post-item-desc">같은 역할의 서버 두 대를 비교해 원인을 좁히고, 이미 만들어져 있던 수정을 운영까지 끌고 간 기록</span>
+  </a>
+  <time datetime="2026-10-22T21:00:00+09:00">2026.10.22</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance postgresql">
+  <a href="/blog/2026/or-filter-lateral-timeout/">
+    <span class="post-item-title">필터 하나 더했더니 35초 타임아웃 — OR 조건과 LATERAL 쿼리 플랜 추적기</span><span class="post-item-desc">그룹화 화면이 무한 로딩에 빠진 원인을 실행 계획에서 찾고, 35초 타임아웃을 64ms 로 줄인 과정</span>
+  </a>
+  <time datetime="2026-10-01T21:00:00+09:00">2026.10.01</time>
+</li>
+
+    <li class="post-item" data-tags="troubleshooting performance infra">
+  <a href="/blog/2026/thumbnail-30s-cache-key-limit/">
+    <span class="post-item-title">썸네일이 정확히 30초 — 캐시 용량이 아니라 키 인덱스가 꽉 차 있었다</span><span class="post-item-desc">30초 타임아웃 밴드에서 출발해 이미지 변환 서버의 nginx 캐시 keys_zone 상한을 찾아내고, 계층별 타임아웃을 다시 맞춘 기록</span>
+  </a>
+  <time datetime="2026-08-28T21:00:00+09:00">2026.08.28</time>
+</li>
+
   </ul>
 </section>
 

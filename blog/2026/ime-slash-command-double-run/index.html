@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<!-- Begin Jekyll SEO tag v2.9.1 -->
+<title>한글로 쳤더니 페이지가 2개 — IME 조합 이벤트와 이중 실행 경로 | 서현원</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="한글로 쳤더니 페이지가 2개 — IME 조합 이벤트와 이중 실행 경로" />
+<meta name="author" content="서현원" />
+<meta property="og:locale" content="ko" />
+<meta name="description" content="같은 IME 문제를 두 레이어가 각자 해결하고 있어서, compositionend 한 번에 명령이 두 번 실행된 이야기" />
+<meta name="twitter:description" property="og:description" content="같은 IME 문제를 두 레이어가 각자 해결하고 있어서, compositionend 한 번에 명령이 두 번 실행된 이야기" />
+<link rel="canonical" href="https://viroovr.github.io/blog/2026/ime-slash-command-double-run/" />
+<meta property="og:url" content="https://viroovr.github.io/blog/2026/ime-slash-command-double-run/" />
+<meta property="og:site_name" content="서현원" />
+<meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-03-30T21:00:00+09:00" />
+<meta property="article:modified_time" content="2026-03-30T21:00:00+09:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta name="twitter:title" content="한글로 쳤더니 페이지가 2개 — IME 조합 이벤트와 이중 실행 경로" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"서현원"},"dateModified":"2026-03-30T21:00:00+09:00","datePublished":"2026-03-30T21:00:00+09:00","description":"같은 IME 문제를 두 레이어가 각자 해결하고 있어서, compositionend 한 번에 명령이 두 번 실행된 이야기","headline":"한글로 쳤더니 페이지가 2개 — IME 조합 이벤트와 이중 실행 경로","image":"https://viroovr.github.io/assets/img/my_pic.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://viroovr.github.io/blog/2026/ime-slash-command-double-run/"},"url":"https://viroovr.github.io/blog/2026/ime-slash-command-double-run/"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link type="application/atom+xml" rel="alternate" href="https://viroovr.github.io/feed.xml" title="서현원" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234f46e5%22/><text x=%2250%22 y=%2268%22 font-size=%2256%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22700%22>현</text></svg>">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script>
+  // 테마: 저장값 > OS 설정. 깜빡임 없게 head 에서 먼저 적용
+  (function () {
+    var t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+  })();
+</script>
+
+</head>
+<body class="post">
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">서현원</a>
+    <nav class="nav" aria-label="주요 메뉴"><a href="/blog/" aria-current="page">블로그</a>
+      <a href="/projects/" >프로젝트</a>
+      <button class="theme-toggle" type="button" aria-label="다크 모드 전환" title="다크 모드 전환">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+  <main id="main" class="wrap">
+    <article class="article">
+  <header class="article-head">
+    <a class="back" href="/blog/">← 블로그</a>
+    <h1>한글로 쳤더니 페이지가 2개 — IME 조합 이벤트와 이중 실행 경로</h1><p class="lead">같은 IME 문제를 두 레이어가 각자 해결하고 있어서, compositionend 한 번에 명령이 두 번 실행된 이야기</p>
+    <p class="meta">
+      <time datetime="2026-03-30T21:00:00+09:00">2026년 3월 30일</time>
+      · 3분 읽기 · <a class="tag" href="/blog/?tag=troubleshooting">#troubleshooting</a> · <a class="tag" href="/blog/?tag=frontend">#frontend</a>
+    </p>
+  </header>
+  <div class="prose">
+    <h2 id="증상">증상</h2>
+
+<p>위키 에디터에서 <code class="language-plaintext highlighter-rouge">/페이지 생성</code> 을 <strong>한글로 직접 타이핑하고 Enter</strong> 를 누르면, 새 페이지가 1개가 아니라 <strong>2개</strong> 생겼습니다. 쓸데없는 빈 페이지가 쌓이니 사용자 입장에서는 데이터가 꼬인 것처럼 보이는 문제였습니다.</p>
+
+<h2 id="관측-사실">관측 사실</h2>
+
+<ul>
+  <li>네트워크 탭을 보면 페이지 생성 API 가 프론트엔드에서 <strong>두 번</strong> 호출됐습니다.</li>
+  <li>백엔드는 요청 두 개를 받아 정상적으로 두 개를 만들었을 뿐이었습니다. 문제는 “왜 프론트가 두 번 부르나”였습니다.</li>
+  <li>다른 슬래시 명령(제목, 목록, 토글 등)은 겉보기에 정상이었습니다.</li>
+</ul>
+
+<h2 id="배경-ime-조합-중의-enter">배경: IME 조합 중의 Enter</h2>
+
+<p>한글처럼 조합형 입력기(IME)를 쓰는 언어는, 마지막 글자를 아직 조합 중인 상태에서 Enter 가 들어오면 keydown 이벤트에 <code class="language-plaintext highlighter-rouge">isComposing = true</code> 가 붙습니다. 이때 바로 명령을 실행하면 조합 중인 글자가 깨지거나 이상하게 동작하기 때문에, 보통은 <strong>조합이 끝나는 <code class="language-plaintext highlighter-rouge">compositionend</code> 시점으로 실행을 미룹니다.</strong></p>
+
+<h2 id="원인-같은-문제를-두-곳에서-풀고-있었다">원인: 같은 문제를 두 곳에서 풀고 있었다</h2>
+
+<p>코드를 따라가 보니, 이 “실행 미루기”가 <strong>서로 다른 레이어에 두 번</strong> 구현돼 있었습니다.</p>
+
+<p><strong>경로 A — 명령 레이어</strong></p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 모든 슬래시 명령을 감싸는 래퍼</span>
+<span class="kd">function</span> <span class="nf">safeCommand</span><span class="p">(</span><span class="nx">run</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return </span><span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">isComposing</span><span class="p">)</span> <span class="p">{</span>            <span class="c1">// 조합 중이면</span>
+      <span class="nx">pendingCommand</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nf">run</span><span class="p">(...</span><span class="nx">args</span><span class="p">);</span>   <span class="c1">// 보류해 두고</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nf">run</span><span class="p">(...</span><span class="nx">args</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+<span class="c1">// 전역 compositionend 리스너가 pendingCommand 를 실행</span>
+</code></pre></div></div>
+
+<p><strong>경로 B — 메뉴 UI 레이어</strong></p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 캡처 단계 keydown: 조합 중 Enter 면 표시만 해 둔다</span>
+<span class="k">if </span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">isComposing</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">key</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">Enter</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">e</span><span class="p">.</span><span class="nf">preventDefault</span><span class="p">();</span> <span class="nx">e</span><span class="p">.</span><span class="nf">stopPropagation</span><span class="p">();</span>
+  <span class="nx">pendingEnter</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// compositionend: 선택된 메뉴 항목을 '클릭'해 준다</span>
+<span class="k">if </span><span class="p">(</span><span class="nx">pendingEnter</span><span class="p">)</span> <span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">selectedItem</span><span class="p">.</span><span class="nf">click</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">compositionend</code> 가 한 번 발생하면:</p>
+
+<ol>
+  <li>경로 A 가 보류해 둔 명령을 실행합니다. → API 1회</li>
+  <li>경로 B 가 메뉴 항목에 합성 <code class="language-plaintext highlighter-rouge">click()</code> 을 보내고, 이 클릭이 메뉴의 선택 핸들러를 거쳐 명령을 다시 부릅니다. 이 시점에는 조합이 이미 끝나 <code class="language-plaintext highlighter-rouge">isComposing = false</code> 라서 <strong>즉시 실행</strong>됩니다. → API 2회</li>
+</ol>
+
+<p>두 구현은 서로의 존재를 모르고 있었습니다.</p>
+
+<h3 id="왜-다른-명령은-멀쩡해-보였나">왜 다른 명령은 멀쩡해 보였나</h3>
+
+<p>사실 모든 슬래시 명령이 두 번 실행되고 있었습니다. 다만 “제목으로 바꾸기”, “토글 만들기” 같은 에디터 내부 조작은 두 번 해도 결과가 같습니다(<strong>멱등</strong>). 서버에 새 리소스를 만드는 “페이지 생성”만 <strong>비멱등</strong>이라 두 번 실행된 흔적이 눈에 보였던 것입니다.</p>
+
+<h2 id="수정-방향-고르기">수정 방향 고르기</h2>
+
+<ul>
+  <li><strong>A. 경로 B(합성 클릭)를 지운다.</strong> 바뀌는 파일이 1개이고, 명령 레이어의 래퍼는 17개 명령 전체에 이미 일관되게 적용돼 있습니다. 불안정한 DOM 합성 클릭 패턴도 함께 사라집니다.</li>
+  <li><strong>B. 경로 A(래퍼)를 지운다.</strong> 모든 명령 정의에서 래퍼를 벗겨야 해서 범위가 넓고, 합성 클릭에 계속 의존하게 됩니다.</li>
+</ul>
+
+<p>A 를 골랐습니다. 단, <strong>조합 중 Enter 를 막는 부분은 남겨야</strong> 했습니다. 이것까지 지우면 메뉴 라이브러리가 조합 중인 Enter 를 직접 처리해 다른 문제가 생깁니다. 역할을 이렇게 나눴습니다.</p>
+
+<ul>
+  <li>메뉴 UI 레이어는 <strong>이벤트 차단만</strong> 합니다.</li>
+  <li>명령 레이어는 <strong>실행만</strong> 합니다.</li>
+</ul>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if </span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">isComposing</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if </span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">key</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">Enter</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">e</span><span class="p">.</span><span class="nf">preventDefault</span><span class="p">();</span> <span class="nx">e</span><span class="p">.</span><span class="nf">stopPropagation</span><span class="p">();</span> <span class="nx">e</span><span class="p">.</span><span class="nf">stopImmediatePropagation</span><span class="p">();</span>
+    <span class="c1">// pendingEnter = true;   ← 삭제</span>
+  <span class="p">}</span>
+  <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// compositionend 의 selectedItem.click() 블록 ← 삭제</span>
+</code></pre></div></div>
+
+<p>표 안에서 쓰는 별도 IME 처리는 다른 흐름이라 건드리지 않았습니다.</p>
+
+<h2 id="검증과-남은-것">검증과 남은 것</h2>
+
+<ul>
+  <li>실행 경로가 <code class="language-plaintext highlighter-rouge">compositionend → pendingCommand()</code> 한 곳으로 모이는 것을 코드로 확인했습니다. 지운 플래그를 참조하는 곳이 0건인 것도 확인했습니다.</li>
+  <li>원래 재현 케이스, 영문 입력, 표 안 입력, 링크 팝오버, 다른 명령까지 6개 시나리오를 점검했습니다.</li>
+  <li>다만 이 시점에는 <strong>실제 브라우저에서 한글 IME 로 끝까지 돌리는 자동 테스트가 없었습니다.</strong> 기존 빌드 오류 때문에 컴파일 단계 검증도 완전하지 않았습니다. 그래서 배포 전 수동 QA 를 조건으로 걸었습니다.</li>
+</ul>
+
+<h2 id="배운-점">배운 점</h2>
+
+<ul>
+  <li><strong>“두 번 실행”은 서버보다 클라이언트 이벤트 흐름을 먼저 의심합니다.</strong> 백엔드는 받은 요청을 정직하게 처리했을 뿐이었습니다.</li>
+  <li><strong>같은 문제를 푸는 코드가 이미 있는지 먼저 찾습니다.</strong> IME 처리를 추가하기 전에 <code class="language-plaintext highlighter-rouge">compositionend</code>, <code class="language-plaintext highlighter-rouge">isComposing</code> 을 grep 했다면 이중 구현을 피할 수 있었습니다.</li>
+  <li><strong>멱등한 동작은 버그를 숨깁니다.</strong> 테스트 시나리오에 반드시 비멱등 동작(서버 생성 API)을 넣어야 합니다.</li>
+  <li><strong>한 관심사에는 소유자를 하나만 둡니다.</strong> 차단하는 쪽과 실행하는 쪽을 나누면 이런 겹침이 생기기 어렵습니다.</li>
+  <li>중기적으로는 “실행 중” 플래그로 같은 명령의 중복 호출을 막는 가드를, 장기적으로는 IME 입력을 포함한 E2E 테스트를 남겼습니다.</li>
+</ul>
+
+  </div>
+  <nav class="pager" aria-label="이전·다음 글"><span></span><a class="next" href="/blog/2026/ghost-session-sampling-check/"><small>다음 글</small>쫓아낸 기기가 계속 로그인돼 있다 — 1/1000 샘플링 검증이 만든 유령 세션</a>
+  </nav>
+</article>
+
+  </main>
+  <footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 서현원</span>
+    <span class="footer-links">
+      <a href="https://github.com/viroovr" rel="noopener">GitHub</a>
+      <a href="mailto:tjgusdnjs789@gmail.com">Email</a>
+      <a href="/feed.xml">RSS</a>
+    </span>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js" defer></script>
+</body>
+</html>

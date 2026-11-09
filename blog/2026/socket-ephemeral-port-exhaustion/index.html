@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<!-- Begin Jekyll SEO tag v2.9.1 -->
+<title>CPU 99% 인데 범인은 CPU 가 아니었다 — 소켓 서버의 임시 포트 고갈 | 서현원</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="CPU 99% 인데 범인은 CPU 가 아니었다 — 소켓 서버의 임시 포트 고갈" />
+<meta name="author" content="서현원" />
+<meta property="og:locale" content="ko" />
+<meta name="description" content="nginx 가 CPU 를 다 쓰던 실시간 서버 장애를, 코드 한 줄 없이 커널 네트워크 설정으로 푼 과정과 그 설정이 조용히 사라진 후일담" />
+<meta name="twitter:description" property="og:description" content="nginx 가 CPU 를 다 쓰던 실시간 서버 장애를, 코드 한 줄 없이 커널 네트워크 설정으로 푼 과정과 그 설정이 조용히 사라진 후일담" />
+<link rel="canonical" href="https://viroovr.github.io/blog/2026/socket-ephemeral-port-exhaustion/" />
+<meta property="og:url" content="https://viroovr.github.io/blog/2026/socket-ephemeral-port-exhaustion/" />
+<meta property="og:site_name" content="서현원" />
+<meta property="og:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-06-17T21:00:00+09:00" />
+<meta property="article:modified_time" content="2026-06-17T21:00:00+09:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://viroovr.github.io/assets/img/my_pic.jpg" />
+<meta name="twitter:title" content="CPU 99% 인데 범인은 CPU 가 아니었다 — 소켓 서버의 임시 포트 고갈" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"서현원"},"dateModified":"2026-06-17T21:00:00+09:00","datePublished":"2026-06-17T21:00:00+09:00","description":"nginx 가 CPU 를 다 쓰던 실시간 서버 장애를, 코드 한 줄 없이 커널 네트워크 설정으로 푼 과정과 그 설정이 조용히 사라진 후일담","headline":"CPU 99% 인데 범인은 CPU 가 아니었다 — 소켓 서버의 임시 포트 고갈","image":"https://viroovr.github.io/assets/img/my_pic.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://viroovr.github.io/blog/2026/socket-ephemeral-port-exhaustion/"},"url":"https://viroovr.github.io/blog/2026/socket-ephemeral-port-exhaustion/"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link type="application/atom+xml" rel="alternate" href="https://viroovr.github.io/feed.xml" title="서현원" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234f46e5%22/><text x=%2250%22 y=%2268%22 font-size=%2256%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22700%22>현</text></svg>">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script>
+  // 테마: 저장값 > OS 설정. 깜빡임 없게 head 에서 먼저 적용
+  (function () {
+    var t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+  })();
+</script>
+
+</head>
+<body class="post">
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">서현원</a>
+    <nav class="nav" aria-label="주요 메뉴"><a href="/blog/" aria-current="page">블로그</a>
+      <a href="/projects/" >프로젝트</a>
+      <button class="theme-toggle" type="button" aria-label="다크 모드 전환" title="다크 모드 전환">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+  <main id="main" class="wrap">
+    <article class="article">
+  <header class="article-head">
+    <a class="back" href="/blog/">← 블로그</a>
+    <h1>CPU 99% 인데 범인은 CPU 가 아니었다 — 소켓 서버의 임시 포트 고갈</h1><p class="lead">nginx 가 CPU 를 다 쓰던 실시간 서버 장애를, 코드 한 줄 없이 커널 네트워크 설정으로 푼 과정과 그 설정이 조용히 사라진 후일담</p>
+    <p class="meta">
+      <time datetime="2026-06-17T21:00:00+09:00">2026년 6월 17일</time>
+      · 4분 읽기 · <a class="tag" href="/blog/?tag=troubleshooting">#troubleshooting</a> · <a class="tag" href="/blog/?tag=performance">#performance</a> · <a class="tag" href="/blog/?tag=infra">#infra</a>
+    </p>
+  </header>
+  <div class="prose">
+    <h2 id="증상">증상</h2>
+
+<p>실시간 대시보드용 socket.io 서버(소형 VM 1대)에서 아침 9시 20분쯤부터 CPU 가 오르기 시작해, 9시 50분에는 <strong>99.9% 로 고정</strong>됐습니다. 메모리와 디스크는 정상이었습니다.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">top</code> 을 보니 CPU 를 다 쓰는 것은 Node 가 아니라 <strong>nginx worker 4개</strong>(각 88~97%)였습니다. Node 는 17% 였습니다.</li>
+  <li>브라우저의 socket.io 요청은 WebSocket 이 아니라 <strong><code class="language-plaintext highlighter-rouge">transport=polling</code></strong> 으로 몰려 있었고, 타임아웃과 실패가 많았습니다.</li>
+  <li>동시 연결 수가 9천 → 2만 → 3만 이상까지 올랐다가, 한꺼번에 끊겨 0 근처로 떨어지기를 반복했습니다.</li>
+</ul>
+
+<p>구성은 이렇습니다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>브라우저 → nginx(컨테이너) → docker-proxy(호스트) → Node(socket.io, 단일 프로세스)
+</code></pre></div></div>
+
+<h2 id="관측-사실">관측 사실</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">ss</code>: 연결 상태 중 closed 가 약 3만 개였습니다. 연결이 생겼다 사라지는 속도(churn)가 컸습니다.</li>
+  <li><code class="language-plaintext highlighter-rouge">nstat</code>: ListenOverflows/ListenDrops 약 188만, SyncookiesSent 11.6만.</li>
+  <li><code class="language-plaintext highlighter-rouge">dmesg</code>: <code class="language-plaintext highlighter-rouge">Possible SYN flooding on port ... Sending cookies</code> 반복.</li>
+  <li>Node: 이벤트 루프 지연 p95 가 181ms → 618ms 로 올랐지만, 재시작이나 OOM 은 없었고 에러 로그도 비어 있었습니다.</li>
+</ul>
+
+<h2 id="원인-후보">원인 후보</h2>
+
+<ol>
+  <li><strong>accept 큐 넘침 + 임시(ephemeral) 포트 고갈</strong> — 채택.</li>
+  <li><strong>Node 단일 스레드의 처리 한계</strong> — 기각. 튜닝 후 같은 단일 Node 가 3만 3천 연결을 이벤트 루프 p95 6.75ms, CPU idle 89% 로 버텼습니다. p95 618ms 는 원인이 아니라 I/O 가 굶은 결과였습니다.</li>
+  <li><strong>Node 크래시 루프</strong> — 기각. 재시작 횟수와 업타임이 변하지 않았고, OOM 도 없었습니다.</li>
+</ol>
+
+<h2 id="메커니즘">메커니즘</h2>
+
+<ol>
+  <li>polling 클라이언트는 요청마다 짧은 HTTP 연결을 만듭니다. 그래서 nginx 가 Node 로 여는 연결(업스트림)이 짧게 살다 죽기를 폭발적으로 반복합니다.</li>
+  <li>nginx → Node 연결은 <strong>목적지가 항상 같은 IP 와 포트</strong>입니다. 연결을 구분하는 변수는 nginx 쪽 <strong>임시 포트</strong>뿐이고, 리눅스 기본 범위(32768~60999)는 약 2.8만 개입니다.</li>
+  <li>닫힌 연결은 <code class="language-plaintext highlighter-rouge">TIME_WAIT</code> 상태로 약 60초 동안 포트를 붙잡습니다. churn 이 크면 “사용 중 + TIME_WAIT” 가 범위를 넘고, 새 연결이 포트를 못 받습니다.</li>
+  <li>실패한 클라이언트는 재시도하고, 재시도가 다시 부하를 만듭니다. 동시에 accept 큐(docker-proxy 4096, Node 511)도 넘쳐 SYN 이 버려지고 syncookie 가 발동합니다.</li>
+  <li>nginx 는 실패와 재시도를 처리하느라 CPU 를 다 씁니다. <strong>경보에 찍힌 CPU 99% 는 증상이었고, 원인은 OS 한도</strong>였습니다.</li>
+</ol>
+
+<p>솔직하게 적어 두면, 튜닝 전에 포트 사용량을 직접 세지는 못했습니다. “포트 고갈이 마지막 병목”이라는 판단은 단계별 튜닝 전후의 변화에서 나온 것입니다.</p>
+
+<h2 id="수정-코드-변경-0줄">수정: 코드 변경 0줄</h2>
+
+<p>세 가지 방향을 비교했습니다.</p>
+
+<ul>
+  <li><strong>A. OS 네트워크 튜닝</strong> — 코드 변경이 없고, 즉시 적용할 수 있고, 되돌리기 쉽습니다. 채택.</li>
+  <li><strong>B. Node 스케일아웃(cluster + Redis adapter + sticky session)</strong> — 코드와 배포가 필요하고, 진단상 Node 가 병목이 아니었습니다. 장기 옵션으로 보류.</li>
+  <li><strong>C. 일부 사용자의 기능 차단(load shedding)</strong> — 제품 결정이 필요하고 A 로 해결돼 불필요했습니다.</li>
+</ul>
+
+<p>적용은 두 단계로 나눠 했습니다.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 1단계: 큐를 키운다 (호스트)</span>
+sysctl <span class="nt">-w</span> net.core.somaxconn<span class="o">=</span>65535
+sysctl <span class="nt">-w</span> net.ipv4.tcp_max_syn_backlog<span class="o">=</span>65535
+<span class="c"># nginx:  listen &lt;port&gt; reuseport backlog=65535;</span>
+
+<span class="c"># 2단계: 임시 포트를 넓히고 TIME_WAIT 재사용 (nginx 컨테이너 netns)</span>
+<span class="c">#   net.ipv4.ip_local_port_range = "1024 65535"</span>
+<span class="c">#   net.ipv4.tcp_tw_reuse = 1</span>
+</code></pre></div></div>
+
+<ul>
+  <li>docker-proxy 는 <strong>호스트 쪽에서 별도로 listen</strong> 합니다. 컨테이너 안의 nginx 만 튜닝해서는 부족하고, 호스트 값을 바꾼 뒤 컨테이너를 다시 만들어야 새 backlog 로 bind 됩니다.</li>
+  <li><code class="language-plaintext highlighter-rouge">tcp_tw_reuse</code> 는 나가는 연결(nginx → Node)에만 효과가 있습니다.</li>
+  <li>포트 범위는 컨테이너 네임스페이스에만 넓혔습니다. 호스트 범위를 1024 까지 내리면 앱의 listen 포트와 겹칠 수 있기 때문입니다.</li>
+</ul>
+
+<p>1단계 뒤에도 연결 수가 약 6,500 근처에서 출렁였고 ListenOverflows 가 10초에 1,651씩 늘었습니다. 이때 “이제 Node 한계다”라고 성급하게 해석할 뻔했습니다. 포트 범위를 넓힌 2단계가 마지막 병목을 풀었습니다.</p>
+
+<h2 id="결과">결과</h2>
+
+<ul>
+  <li>docker-proxy backlog: 4096 → 65535</li>
+  <li>nginx CPU(1단계): 360% → 25%</li>
+  <li>최대 동시 연결: 6,500 근처에서 출렁임 → <strong>3만 3천 이상 안정</strong></li>
+  <li>Node 이벤트 루프 p95: 618ms → <strong>6.75ms</strong></li>
+  <li>CPU idle(2단계): 0% → <strong>89%</strong></li>
+</ul>
+
+<h2 id="후일담-설정이-조용히-사라졌다">후일담: 설정이 조용히 사라졌다</h2>
+
+<p>두 달 뒤, 연결 수 급증을 조사하다가 우연히 발견했습니다.</p>
+
+<ul>
+  <li>호스트를 재부팅한 뒤 <code class="language-plaintext highlighter-rouge">somaxconn</code> 이 4096 으로 돌아가 있었습니다. <code class="language-plaintext highlighter-rouge">sysctl -w</code> 는 <strong>런타임 설정이라 재부팅하면 사라지는데</strong>, 영구 설정 파일을 만들어 두지 않았던 것입니다.</li>
+  <li>nginx 의 <code class="language-plaintext highlighter-rouge">backlog=65535</code> 는 살아 있었지만 커널 상한 4096 에 잘려 실제로는 4096 이었습니다.</li>
+  <li>인프라를 재구성하면서 compose 파일 세트가 바뀌어, 컨테이너 sysctl 선언은 더 이상 쓰지 않는 옛 파일에만 남아 있었습니다.</li>
+</ul>
+
+<p>무중단으로 할 수 있는 것부터 했습니다. 호스트 값은 <code class="language-plaintext highlighter-rouge">/etc/sysctl.d/</code> 파일로 영구화했습니다. 컨테이너 쪽 선언 복원은 3만 연결이 끊기는 작업이라 저부하 시간대로 미뤘습니다. 이미 bind 된 소켓의 backlog 는 listen 시점 값으로 고정되므로, 다음 재생성 때부터 적용됩니다.</p>
+
+<h2 id="배운-점">배운 점</h2>
+
+<ul>
+  <li><strong>CPU 경보는 증상입니다.</strong> 누가 CPU 를 쓰는지(<code class="language-plaintext highlighter-rouge">top</code>)부터 보고, 그 프로세스가 왜 바쁜지를 따라갑니다. 이번에는 nginx 가 실패한 연결을 처리하느라 바빴습니다.</li>
+  <li><strong>지연이 높다고 앱 한계로 단정하지 않습니다.</strong> 업스트림 I/O(포트, TIME_WAIT, accept 큐)를 먼저 배제합니다.</li>
+  <li><strong>polling 에 갇힌 실시간 연결은 부하를 증폭시킵니다.</strong> WebSocket 업그레이드 실패 원인은 아직 숙제로 남아 있습니다.</li>
+  <li><strong>손으로 고친 설정은 선언(sysctl.d, compose, 코드)으로 남기지 않으면 반드시 사라집니다.</strong> 사라지는 계기는 장애가 아니라 재부팅, 재구성 같은 평범한 운영 작업입니다.</li>
+</ul>
+
+<h2 id="진단-순서-런북">진단 순서 (런북)</h2>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">top</code> — CPU 를 쓰는 프로세스가 누구인가</li>
+  <li><code class="language-plaintext highlighter-rouge">ss -s</code>, <code class="language-plaintext highlighter-rouge">ss -lnt</code> — 연결 상태 분포와 listen 큐(Send-Q = backlog)</li>
+  <li><code class="language-plaintext highlighter-rouge">nstat</code> 의 ListenOverflows/ListenDrops/SyncookiesSent, <code class="language-plaintext highlighter-rouge">dmesg</code> 의 SYN flooding</li>
+  <li>closed/TIME_WAIT 개수와 <code class="language-plaintext highlighter-rouge">ip_local_port_range</code> 비교</li>
+  <li>그다음에 앱(Node) 상태</li>
+  <li>경보 지표에 ListenOverflows 증가율과 임시 포트 사용률을 추가</li>
+</ol>
+
+  </div>
+  <nav class="pager" aria-label="이전·다음 글"><a class="prev" href="/blog/2026/keydown-forced-reflow/"><small>이전 글</small>키 하나에 19ms — 입력 지연을 만든 범인은 애니메이션이 아니라 :visible 이었다</a><a class="next" href="/blog/2026/sort-order-tie-break/"><small>다음 글</small>새로고침할 때마다 순서가 바뀐다 — 정렬 키 중복과 tie-break 없는 ORDER BY</a>
+  </nav>
+</article>
+
+  </main>
+  <footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 서현원</span>
+    <span class="footer-links">
+      <a href="https://github.com/viroovr" rel="noopener">GitHub</a>
+      <a href="mailto:tjgusdnjs789@gmail.com">Email</a>
+      <a href="/feed.xml">RSS</a>
+    </span>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js" defer></script>
+</body>
+</html>
